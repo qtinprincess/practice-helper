@@ -240,6 +240,7 @@ function stopMonitor() {
     drift: segs.length >= 6 ? Math.round(E.mean(devs.slice(-3)) - E.mean(devs.slice(0, 3))) : null
   };
   st.monLast = res; monReport(res);
+  if (L.sopMark) L.sopMark('sang');
 }
 function monReport(r) {
   const tips = [];
@@ -380,6 +381,7 @@ function finish(stopped) {
   const drift = biases.length >= 4 ? Math.round((E.mean(biases.slice(-2).map(p => p.bias)) - E.mean(biases.slice(0, 2).map(p => p.bias)))) : null;
   const res = { score: scoreV, cover: Math.round(cover * 100), acc: Math.round(acc * 100), lag: Math.round(bestLag * 1000), phrases: ph, drift, bias: biases.length ? Math.round(E.mean(biases.map(p => p.bias))) : null, stopped };
   st.last = res;
+  if (L.sopMark) L.sopMark('sang');
   const list = getList(); const it = list.find(x => x.id === R0.id);
   if (it && !stopped) { it.best = Math.max(it.best || 0, scoreV); it.last = scoreV; L.store.set(listKey, list); }
   S.render();

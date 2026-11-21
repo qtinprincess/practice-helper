@@ -93,6 +93,7 @@ async function openMic() {
   };
   AU.mic = { stream, src, proc, mute };
   $('#micpill').classList.add('on'); $('#micBtn').textContent = '關閉'; $('#micText').textContent = '收音中';
+  if (!(settings.sop || {}).mic) sopMark('mic');
   listDevices();
   return true;
 }
@@ -1532,6 +1533,17 @@ function tunerFrame(fr) {
   const advice = TU.mode === 'violin' ? (c > 0 ? '太高，放鬆一點' : '太低，轉緊一點') : TU.mode === 'pipe' ? (c > 0 ? '唱高了，放鬆一點' : '唱低了，氣息撐住') : (c > 0 ? '偏高' : '偏低');
   $('#tSub').textContent = `${f.toFixed(1)} Hz　${c > 0 ? '+' : ''}${c.toFixed(1)} cents　${Math.abs(c) <= 3 ? '準了' : advice}${sub ? '　' + sub : ''}`;
   $$('#tStrings button').forEach(b => b.classList.toggle('on', +b.dataset.m === target));
+  if (Math.abs(c) <= 3) {
+    TU.okN = (TU.okTarget === target ? (TU.okN || 0) : 0) + 1; TU.okTarget = target;
+    if (TU.okN === 28) {
+      settings.sop = settings.sop || {}; const T = settings.sop.tune = settings.sop.tune || {};
+      (T[TU.mode] = T[TU.mode] || {})[label] = todayKey(); saveSettings();
+      const n = Object.values(T[TU.mode]).filter(d => d === todayKey()).length;
+      if (TU.mode === 'violin' && n >= stringsOf().length) { sopMark('tunedToday'); FUN.talk('四條弦都調準了！可以開始練琴了！', 'cheer', 'jump', { ms: 4000 }); }
+      else if (TU.mode === 'pipe') { sopMark('pipeToday'); FUN.bubble && FUN.bubble('唱準了！', 2500); }
+      else FUN.bubble && FUN.bubble(label + ' 準了！', 2500);
+    }
+  } else TU.okN = 0;
 }
 
 /* ================= 即時音高小表 ================= */
@@ -1635,7 +1647,7 @@ async function measureGate() {
     AU.listeners.delete(fn);
     vals.sort((a, b) => a - b);
     const p90 = vals[Math.floor(vals.length * 0.9)] || 0.003;
-    settings.gate = Math.min(0.05, Math.max(0.004, p90 * 2.5)); saveSettings();
+    settings.gate = Math.min(0.05, Math.max(0.004, p90 * 2.5)); saveSettings(); sopMark('gate');
     $('#gateOut').textContent = `完成：門檻 ${settings.gate.toFixed(4)}` + (p90 > 0.015 ? '（環境有點吵，建議換安靜的地方）' : '');
   }, 2000);
 }
@@ -1669,7 +1681,8 @@ function showView(v) {
   if (st.run && v !== 'practice') stopAll(true);
   st.view = v;
   if (st.view === 'sing' && v !== 'sing' && window.SING) window.SING.stop();
-  ['practice', 'basics', 'sing', 'tuner', 'library', 'log', 'settings'].forEach(x => { const el = $('#v-' + x); if (el) el.hidden = x !== v; });
+  ['home', 'practice', 'basics', 'sing', 'tuner', 'library', 'log', 'settings'].forEach(x => { const el = $('#v-' + x); if (el) el.hidden = x !== v; });
+  if (v === 'home') renderHome();
   $$('nav button').forEach(b => { if (b.dataset.view === v) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   if (v === 'library') { renderLibrary(); renderAssign(); }
   if (v === 'basics') renderBasics();
@@ -2120,6 +2133,120 @@ function bindDrop() {
   });
 }
 
+/* ================= 從這裡開始：三種樂器的 SOP，做完自動打勾 ================= */
+const ICONS = {
+  violin: '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M33 4h4v14h-4z" fill="#5b3a1e"/><path d="M35 17c6 0 9 4 9 8 0 3-3 4-3 7s5 4 5 12c0 8-7 14-11 14s-11-6-11-14c0-8 5-9 5-12s-3-4-3-7c0-4 3-8 9-8z" fill="#d9822b" stroke="#8a4b16" stroke-width="2"/><path d="M31 38q-2 4 0 7M39 38q2 4 0 7" stroke="#5b3a1e" stroke-width="2" fill="none"/><path d="M8 54 56 10" stroke="#7a5a3a" stroke-width="3" stroke-linecap="round"/></svg>',
+  recorder: '<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="27" y="4" width="10" height="56" rx="5" fill="#f2c14e" stroke="#a8742c" stroke-width="2"/><rect x="26" y="4" width="12" height="9" rx="4" fill="#e0a83a"/>' + [20, 27, 34, 41, 48].map(y => `<circle cx="32" cy="${y}" r="2.6" fill="#7a4f12"/>`).join('') + '</svg>',
+  choir: '<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="22" cy="24" r="10" fill="#ffd6a5"/><circle cx="42" cy="24" r="10" fill="#ffc8dd"/><path d="M8 58c0-12 6-20 14-20s14 8 14 20z" fill="#7c5cff"/><path d="M28 58c0-12 6-20 14-20s14 8 14 20z" fill="#2fa8ff"/><path d="M18 27q4 4 8 0M38 27q4 4 8 0" stroke="#5a3a2a" stroke-width="2" fill="none"/><text x="50" y="12" font-size="12" fill="#ff7a59">♪</text></svg>'
+};
+const todayKey = () => new Date().toISOString().slice(0, 10);
+function sopMark(k, v = true) { settings.sop = settings.sop || {}; settings.sop[k] = v === true ? todayKey() : v; saveSettings(); if (st.view === 'home') renderHome(); }
+const sopHas = k => !!(settings.sop || {})[k];
+const sopToday = k => (settings.sop || {})[k] === todayKey();
+function sessOf(id, test) { return (store.get('lr.sessions', {})[id] || []).some(test || (() => true)); }
+function sessToday(test) { const d0 = new Date(todayKey()).getTime() - 8 * 3600e3; return Object.entries(store.get('lr.sessions', {})).some(([id, S]) => S.some(s => s.at >= d0 && test(id, s))); }
+const basicsPassed = id => !!(basicsProg()['b-' + id] || {}).passed;
+const tunedCount = mode => Object.keys(((settings.sop || {}).tune || {})[mode] || {}).length;
+
+/* 開啟某首曲子、設好模式，跳到練習頁 */
+function goPractice(id, mode, part) {
+  if (part != null) { settings.partSel = settings.partSel || {}; settings.partSel[id] = part; saveSettings(); }
+  loadSong(id); st.mode = mode; settings.mode = mode; saveSettings(); renderModes();
+  st.speed = 100; $('#speed').value = 100; updateSpeedOut(); showView('practice');
+}
+function goBasics(inst, itemId) {
+  settings.basicsInst = inst; saveSettings(); showView('basics');
+  const b = $(`[data-bid="${itemId}"]`); if (b) b.click();
+}
+function goTuner(mode) { showView('tuner'); const b = $(`#tunerMode [data-tm="${mode}"]`); if (b) b.click(); }
+
+function sopFor(inst) {
+  const setup = [
+    { t: '請大人幫忙：夾好麥克風、戴上耳機，按「開啟麥克風」，對著麥克風發出聲音，看右上角綠色音量條會動', done: () => sopHas('mic'), act: ['開啟麥克風', async () => { if (await openMic()) { sopMark('mic'); toast('麥克風開好了！'); } }] },
+    { t: '測量環境噪音：按下去之後安靜 2 秒', done: () => sopHas('gate'), act: ['測量噪音', () => measureGate()] },
+    { t: '延遲校正：戴耳機，跟著「噠、噠」聲拍手 8 下（這一步決定節奏判斷準不準）', done: () => settings.latency != null, act: ['開始校正', () => calibrate()] }
+  ];
+  if (inst === 'violin') return {
+    name: '小提琴', icon: ICONS.violin,
+    first: setup.concat([
+      { t: '調音：G、D、A、E 四條弦都調到指針變綠色（不會轉弦軸請大人幫忙）', done: () => tunedCount('violin') >= 4, prog: () => `${tunedCount('violin')}/4 條`, act: ['去調音', () => goTuner('violin')] },
+      { t: '基本功第 1 級：空弦長弓，進階模式全部綠燈', done: () => basicsPassed('open-long'), act: ['去練空弦', () => goBasics('violin', 'open-long')] },
+      { t: '第一次拉曲子：「D 大調音階」用初學模式，跟著提示一個音一個音拉完', done: () => sessOf('demo-scale-d', s => s.mode === 'beginner' && !s.partial), act: ['去拉音階', () => goPractice('demo-scale-d', 'beginner')] },
+      { t: '跟著節拍器：「小星星」用進階模式拉一次，看看哪幾小節亮綠燈', done: () => sessOf('demo-twinkle', s => s.mode === 'advanced'), act: ['去拉小星星', () => goPractice('demo-twinkle', 'advanced')] }
+    ]),
+    daily: [
+      { t: '調音：四條弦調到綠色', done: () => sopToday('tunedToday'), act: ['去調音', () => goTuner('violin')] },
+      { t: '基本功練 3 次（從還沒過關的那一項開始）', done: () => ((basicsProg()._days || {})[todayKey()] || 0) >= 3, prog: () => `${(basicsProg()._days || {})[todayKey()] || 0}/3 次`, act: ['去基本功', () => goBasics('violin')] },
+      { t: '練老師指定的曲子：先聽示範，再用初學 → 進階模式，紅燈的地方按「小琴陪你加強」', done: () => sessToday((id, s) => !id.startsWith('b-') && !id.startsWith('demo-')), act: ['去曲庫選曲子', () => showView('library')] },
+      { t: '看紀錄：今天哪裡進步了？分數有沒有比昨天高？', done: () => sopToday('logSeen'), act: ['看紀錄', () => { sopMark('logSeen'); showView('log'); }] }
+    ],
+    contest: '比賽前兩週：每天用「比賽模式」從頭到尾拉一次，再用「模擬上台」練習上台的感覺；最後幾天把「背譜」打開。'
+  };
+  if (inst === 'recorder') return {
+    name: '直笛', icon: ICONS.recorder,
+    first: setup.concat([
+      { t: '試音：到調音頁選「半音階」，吹一個長長的 La（A），看指針是不是在中間', done: () => tunedCount('chromatic') >= 1, act: ['去試音', () => goTuner('chromatic')] },
+      { t: '基本功：直笛長音，每個音吹滿 4 拍', done: () => basicsPassed('rec-long'), act: ['去練長音', () => goBasics('recorder-s', 'rec-long')] },
+      { t: '第一次吹曲子：「小蜜蜂」用初學模式，畫面會顯示指法圖', done: () => sessOf('demo-bee', s => s.mode === 'beginner' && !s.partial), act: ['去吹小蜜蜂', () => goPractice('demo-bee', 'beginner')] },
+      { t: '跟著節拍器：「小蜜蜂」用進階模式吹一次', done: () => sessOf('demo-bee', s => s.mode === 'advanced'), act: ['用進階模式', () => goPractice('demo-bee', 'advanced')] }
+    ]),
+    daily: [
+      { t: '暖身：長音或吐音練一次', done: () => sessToday(id => id === 'b-rec-long' || id === 'b-rec-tongue'), act: ['去暖身', () => goBasics('recorder-s', 'rec-long')] },
+      { t: '基本功練 3 次（音階）', done: () => ((basicsProg()._days || {})[todayKey()] || 0) >= 3, prog: () => `${(basicsProg()._days || {})[todayKey()] || 0}/3 次`, act: ['去基本功', () => goBasics('recorder-s')] },
+      { t: '練老師指定的曲子：先聽示範，再用初學 → 進階模式', done: () => sessToday((id, s) => !id.startsWith('b-') && !id.startsWith('demo-')), act: ['去曲庫選曲子', () => showView('library')] },
+      { t: '看紀錄：今天哪裡進步了？', done: () => sopToday('logSeen'), act: ['看紀錄', () => { sopMark('logSeen'); showView('log'); }] }
+    ],
+    contest: '比賽或直笛團演出前：每天用「比賽模式」完整吹一次；合奏曲記得在「我的聲部」選自己的部，打開其他聲部伴奏一起練。'
+  };
+  return {
+    name: '合唱', icon: ICONS.choir,
+    first: setup.concat([
+      { t: '起音：到調音頁選「合唱起音器」，聽主和弦，唱一個長音，看指針有沒有在中間', done: () => tunedCount('pipe') >= 1, act: ['去起音器', () => goTuner('pipe')] },
+      { t: '發聲練習：用初學模式唱一次', done: () => sessOf('demo-warmup', s => !s.partial), act: ['去發聲', () => goPractice('demo-warmup', 'beginner')] },
+      { t: '分部練習：「小星星（二部合唱）」選自己的聲部，用進階模式唱，其他聲部會當伴奏', done: () => sessOf('demo-twinkle-choir', s => s.mode !== 'beginner'), act: ['去唱小星星', () => goPractice('demo-twinkle-choir', 'advanced')] },
+      { t: '跟唱：到跟唱頁，錄一段清唱或貼 YouTube 歌曲，按「開始聽我唱」', done: () => sopHas('sang'), act: ['去跟唱', () => showView('sing')] }
+    ]),
+    daily: [
+      { t: '發聲練習一次（唱得舒服後，用「移調」升高半音再唱）', done: () => sessToday(id => id === 'demo-warmup' || id.startsWith('b-v-')), act: ['去發聲', () => goPractice('demo-warmup', 'beginner')] },
+      { t: '起音：用合唱起音器唱準自己聲部的第一個音', done: () => sopToday('pipeToday'), act: ['去起音器', () => goTuner('pipe')] },
+      { t: '練合唱曲：選自己的聲部，先單獨唱準，再開其他聲部伴奏一起唱', done: () => sessToday((id, s) => !id.startsWith('b-') && id !== 'demo-warmup'), act: ['去曲庫選曲子', () => showView('library')] },
+      { t: '跟唱：跟著錄音或 YouTube 唱一次', done: () => sopToday('sang'), act: ['去跟唱', () => showView('sing')] }
+    ],
+    contest: '合唱比賽前：在「我的聲部」唱自己的部，打開「背譜」練習；指揮老師要求的咬字、音色、表情，以老師為準。'
+  };
+}
+function renderHome() {
+  const host = $('#v-home'); if (!host) return;
+  const inst = settings.homeInst || null;
+  const head = `<div class="home-hero"><div><div class="eyebrow">從這裡開始</div><h1>今天要練什麼樂器？</h1>
+      <p class="muted">選一個樂器，照著下面的步驟一步一步做。做完的步驟會自動打勾 ✓。</p></div>
+      <button class="speak" id="homeGuide">聽說明</button></div>
+    <div class="inst-pick">${['violin', 'recorder', 'choir'].map(k => { const S = sopFor(k); return `<button class="inst-card ${inst === k ? 'on' : ''}" data-inst="${k}">${S.icon}<b>${S.name}</b></button>`; }).join('')}</div>`;
+  if (!inst) { host.innerHTML = head + '<p class="home-hint">點上面一個樂器開始</p>'; bindHome(); return; }
+  const S = sopFor(inst);
+  const first = S.first.map(x => ({ ...x, ok: !!x.done() })), daily = S.daily.map(x => ({ ...x, ok: !!x.done() }));
+  const fd = first.filter(x => x.ok).length, dd = daily.filter(x => x.ok).length;
+  const firstDone = fd === first.length;
+  const list = (arr, cls) => `<ol class="sop ${cls}">${arr.map((x, i) => `<li class="${x.ok ? 'ok' : ''}"><span class="sop-n">${x.ok ? '✓' : i + 1}</span><div class="sop-t">${esc(x.t)}${x.prog ? ` <span class="muted num">（${esc(x.prog())}）</span>` : ''}</div><button class="btn ${x.ok ? '' : 'primary'} sm" data-sop="${cls}:${i}">${x.ok ? '再做一次' : esc(x.act[0])}</button></li>`).join('')}</ol>`;
+  host.innerHTML = head + `
+    <div class="home-grid">
+      <div class="card home-card ${firstDone ? 'done' : ''}"><div class="hc-top"><h2>第一天：準備好（請大人陪 20 分鐘）</h2><span class="hc-badge">${fd}/${first.length}</span></div>
+        <div class="hc-bar"><b style="width:${Math.round(fd / first.length * 100)}%"></b></div>
+        ${firstDone ? '<p class="muted">第一天的準備都完成了！之後每天照右邊的「每天練琴」做就好。</p>' : ''}${list(first, 'first')}</div>
+      <div class="card home-card"><div class="hc-top"><h2>每天練琴（約 30 分鐘）</h2><span class="hc-badge">${dd}/${daily.length}</span></div>
+        <div class="hc-bar day"><b style="width:${Math.round(dd / daily.length * 100)}%"></b></div>
+        ${list(daily, 'daily')}
+        <p class="home-tip"><b>比賽前</b>　${esc(S.contest)}</p>
+        <p class="home-tip muted">練習的曲子、速度、指法和弓法，請照老師上課教的。小幫手只幫忙檢查音準和節奏。</p></div>
+    </div>`;
+  bindHome();
+  host.querySelectorAll('[data-sop]').forEach(b => b.onclick = () => { const [k, i] = b.dataset.sop.split(':'); (k === 'first' ? S.first : S.daily)[+i].act[1](); });
+}
+function bindHome() {
+  $$('#v-home [data-inst]').forEach(b => b.onclick = () => { settings.homeInst = b.dataset.inst; saveSettings(); renderHome(); FUN.talk(`好！我們來練${sopFor(b.dataset.inst).name}。照著步驟一個一個做，做完會打勾喔！`, 'cheer', 'bounce', { ms: 5000 }); });
+  const g = $('#homeGuide'); if (g) g.onclick = () => FUN.talk('先點你要練的樂器。左邊是第一天要做的準備，請大人陪你一起做；右邊是每天練琴的步驟。每做完一步，數字就會變成打勾。', 'happy', 'bounce', { ms: 12000 });
+}
+
 /* ================= 啟動 ================= */
 FUN.init(settings, saveSettings);
 applyTheme(); bind(); buildTuner(); renderSettings();
@@ -2127,11 +2254,13 @@ setTimeout(() => FUN.bubble && FUN.bubble(FUN.line('hello') + '（點我可以�
 st.mode = E.MODES[settings.mode] ? settings.mode : 'advanced';
 renderModes();
 loadSong(settings.lastSong);
+if (!settings.homeInst || !Object.keys(store.get('lr.sessions', {})).length) showView('home');
+$('.brand').style.cursor = 'pointer'; $('.brand').onclick = () => showView('home');
 liveLoop();
 if (location.protocol === 'file:' && !navigator.mediaDevices) toast('請用 Chrome 或 Edge 開啟這個檔案', 5000);
 
 window.__lr = { st, AU, settings, setRef, loadSong, refUsable };
-window.LR = { st, AU, settings, store, IDB, E, FUN, ac, openMic, latency, click, toast, save: saveSettings, importFile };
+window.LR = { st, AU, settings, store, IDB, E, FUN, ac, openMic, latency, click, toast, save: saveSettings, importFile, sopMark };
 if (window.SING) window.SING.init(window.LR);
 
 /* 自我測試：在主控台輸入 selfTest() 會合成一段有錯的演奏並跑完整評分 */

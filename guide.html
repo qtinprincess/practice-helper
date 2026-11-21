@@ -3,14 +3,14 @@
 <title>練琴小幫手使用說明書</title>
 <meta name="author" content="悠樂媽媽">
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <style>
 /* 版面：和練琴小幫手同一套譜架風格。左邊窄欄放章節目錄，右邊是閱讀欄；步驟用圓圈數字，因為順序本身就是內容。 */
 :root{
-  --bg:#f3f4f2; --surface:#ffffff; --sunk:#eceeeb; --ink:#1c211f; --muted:#5f6964; --line:#dde1de;
-  --accent:#2d5a4c; --accent-soft:#e3ece8; --rosin:#a8742c;
+  --bg:#f4f6ff; --surface:#ffffff; --sunk:#eceeeb; --ink:#1c211f; --muted:#5f6964; --line:#dde1de;
+  --accent:#6c4cf5; --accent-soft:#efeaff; --rosin:#ff8a3d;
   --ok:#2f9e5b; --warn:#d49a12; --bad:#cf4339; --sharp:#e0782a; --flat:#2f6fbf; --paper:#fdfdfb; --paper-ink:#1c211f;
-  --display:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --display:"Huninn","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
   --body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
@@ -22,7 +22,7 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.8 var(--body);-webkit-font-smoothing:antialiased}
 .wrap{max-width:1120px;margin:0 auto;padding-block:40px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;grid-template-columns:220px minmax(0,1fr);gap:48px}
-h1,h2,h3{font-family:var(--display);font-weight:700;letter-spacing:.02em;text-wrap:balance;margin:0}
+h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.02em;text-wrap:balance;margin:0}
 h1{font-size:clamp(30px,5vw,44px);line-height:1.25}
 h2{font-size:26px;margin-bottom:6px}
 h3{font-size:18px;margin:22px 0 6px}
@@ -101,6 +101,11 @@ tr:last-child td{border-bottom:0}
 .fix code{font-family:var(--body);font-weight:700}
 
 .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:22px 24px;margin:18px 0}
+.picks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0}
+.pick{display:flex;flex-direction:column;gap:4px;padding:18px;border-radius:18px;background:var(--surface);border:3px solid var(--c);text-decoration:none;color:var(--ink);box-shadow:0 4px 0 var(--c)}
+.pick b{font-family:"Huninn",var(--display);font-weight:400;font-size:24px;color:var(--c)}
+.pick span{font-size:14px;color:var(--muted)}
+@media (max-width:520px){.picks{grid-template-columns:minmax(0,1fr)}}
 .daily{display:grid;gap:8px;list-style:none;padding:0;margin:12px 0 0;max-width:none}
 .daily li{display:flex;gap:12px;align-items:flex-start}
 .daily li::before{content:"";flex:none;width:18px;height:18px;border:1.5px solid var(--accent);border-radius:4px;margin-top:5px}
@@ -129,7 +134,11 @@ footer{margin-top:48px;font-size:13px;color:var(--muted)}
 <nav class="toc" aria-label="目錄">
   <div class="eyebrow">目錄</div>
   <ol>
-    <li><a href="#quick">五步驟開始練</a></li>
+    <li><a href="#quick">選你的樂器</a></li>
+    <li><a href="#sop-common">共用：第一天準備</a></li>
+    <li><a href="#sop-violin">小提琴 SOP</a></li>
+    <li><a href="#sop-recorder">直笛 SOP</a></li>
+    <li><a href="#sop-choir">合唱 SOP</a></li>
     <li><a href="#prepare">準備與安裝</a></li>
     <li><a href="#first">第一次設定</a></li>
     <li><a href="#lights">看懂燈號與顏色</a></li>
@@ -163,15 +172,57 @@ footer{margin-top:48px;font-size:13px;color:var(--muted)}
 </section>
 
 <section id="quick">
-  <h2>五步驟開始練</h2>
-  <p class="muted">設定好之後，每天練琴只要這五步。</p>
+  <h2>選你的樂器</h2>
+  <p>打開網站後，點上方的 <span class="ui pri">從這裡開始</span>，選小提琴、直笛或合唱，畫面會一步一步帶著做，<b>做完的步驟會自動打勾</b>。不知道從哪裡開始時，跟著它做就對了。下面是同一套步驟的文字版：</p>
+  <div class="picks"><a class="pick" href="#sop-violin" style="--c:#d9822b"><b>小提琴</b><span>空弦、音階、琶音到比賽曲</span></a><a class="pick" href="#sop-recorder" style="--c:#e0a83a"><b>直笛</b><span>長音、吐音、指法圖</span></a><a class="pick" href="#sop-choir" style="--c:#6c4cf5"><b>合唱</b><span>發聲、起音、分部、跟唱</span></a></div>
+  <p class="muted">三種樂器的「第一天準備」前三步一樣（見下一章），之後才分開。</p>
+</section>
+
+<section id="sop-common">
+  <h2>共用：第一天的前三步</h2>
+  <p class="muted">三種樂器都一樣，請大人陪著做一次就好。換電腦、換麥克風或換耳機時再做一次。</p>
   <ol class="five">
-    <li><div><b>夾好麥克風，按右上角「開啟」</b><p>拉一個音，看到右上角綠色的音量條會動，就表示聽得到。</p></div></li>
-    <li><div><b>到「調音」把四條弦調準</b><p>每條弦都調到指針在正中間、字變綠色才算好。</p></div></li>
-    <li><div><b>選曲子，按「聆聽示範」</b><p>先聽一次正確的旋律。只想聽一段，就先點那一小節再按。</p></div></li>
-    <li><div><b>選模式，按「開始練習」</b><p>新曲子用「初學」，熟了用「進階」，上台前用「比賽」。電腦也可以按 <kbd>空白鍵</kbd> 開始或停止。</p></div></li>
-    <li><div><b>看燈號和下面的說明，再練一次</b><p>紅燈的小節要再練。按「小琴陪你加強」，小琴會陪你一小段一小段練。</p></div></li>
+    <li><div><b>夾好麥克風、戴上耳機，按「開啟麥克風」</b><p>瀏覽器問能不能用麥克風時按「允許」。對著麥克風發出聲音，右上角綠色的音量條會動，就表示聽得到。</p></div></li>
+    <li><div><b>測量環境噪音</b><p>按下去之後安靜 2 秒，小幫手會記住環境有多吵，不會把雜音當成琴聲或歌聲。</p></div></li>
+    <li><div><b>延遲校正</b><p>戴著耳機，跟著「噠、噠」聲拍手 8 下。這一步決定節奏判斷準不準，一定要做。</p></div></li>
   </ol>
+  <h3>每一次練習都一樣的操作</h3>
+  <ul>
+    <li><b>聆聽示範</b>：先聽一次正確的旋律。只想聽一段，先點那一小節再按。</li>
+    <li><b>選模式、按「開始練習」</b>：新曲子用「初學」，熟了用「進階」，上台前用「比賽」。電腦也可以按 <kbd>空白鍵</kbd> 開始或停止。</li>
+    <li><b>看燈號</b>：綠燈很棒、黃燈差一點、紅燈要再練。報告會先列出最重要的 3 件事。</li>
+    <li><b>小琴陪你加強</b>：紅燈的小節，小琴會用慢速一小段一小段陪你練。</li>
+  </ul>
+</section>
+
+<section id="sop-violin">
+  <h2>小提琴 SOP</h2>
+  <p class="muted">做完「共用的前三步」之後，接著做：</p>
+  <h3>第一天（請大人陪 20 分鐘）</h3>
+  <ol class="steps"><li><b>調音</b>：到「調音」頁，G、D、A、E 四條弦都調到指針在中間、變綠色。不會轉弦軸請大人幫忙。</li><li><b>基本功第 1 級：空弦長弓</b>：到「基本功」頁按「練習」，用進階模式拉到全部綠燈就過關。</li><li><b>第一次拉曲子</b>：「D 大調音階」用<b>初學模式</b>，畫面會寫出要拉哪條弦、哪根手指，一個音一個音拉完。</li><li><b>跟著節拍器</b>：「小星星」用<b>進階模式</b>拉一次，看看哪幾小節亮綠燈。</li></ol>
+  <h3>每天練琴（約 30 分鐘）</h3>
+  <ol class="steps"><li><b>調音</b>：四條弦調到綠色。</li><li><b>基本功 3 次</b>：從還沒過關的那一項開始（空弦 → 音階 → 琶音 → 兩個八度 → 三個八度）。</li><li><b>練老師指定的曲子</b>：先「聆聽示範」，再用初學模式把音拉對，熟了換進階模式；紅燈的小節按「小琴陪你加強」。</li><li><b>看紀錄</b>：今天哪裡進步了？分數有沒有比昨天高？</li></ol>
+  <div class="note"><b>比賽前</b>　比賽前兩週，每天用「比賽模式」從頭到尾拉一次，再用「模擬上台」練習上台的感覺；最後幾天把「背譜」打開。換把位的指法、弓法，請照老師的安排。</div>
+</section>
+
+<section id="sop-recorder">
+  <h2>直笛 SOP</h2>
+  <p class="muted">做完「共用的前三步」之後，接著做：</p>
+  <h3>第一天（請大人陪 20 分鐘）</h3>
+  <ol class="steps"><li><b>試音</b>：到「調音」頁選「半音階」，吹一個長長的 La（A），看指針是不是在中間。吹太用力音會偏高。</li><li><b>基本功：長音</b>：每個音吹滿 4 拍，氣要穩、音不能晃。</li><li><b>第一次吹曲子</b>：「小蜜蜂」用<b>初學模式</b>，畫面會顯示指法圖（● 按住、○ 放開；設定頁可選德式或英式指法）。</li><li><b>跟著節拍器</b>：「小蜜蜂」用<b>進階模式</b>吹一次。</li></ol>
+  <h3>每天練琴（約 30 分鐘）</h3>
+  <ol class="steps"><li><b>暖身</b>：長音或吐音練一次。</li><li><b>基本功 3 次</b>：C、G、F 大調音階。</li><li><b>練老師指定的曲子</b>：先聽示範，再用初學 → 進階模式。直笛合奏曲在「我的聲部」選自己的部，打開其他聲部伴奏一起練。</li><li><b>看紀錄</b>：今天哪裡進步了？</li></ol>
+  <div class="note"><b>比賽前</b>　比賽或直笛團演出前，每天用「比賽模式」完整吹一次。報告出現「吹太用力，跳到高八度」時，氣放輕一點。</div>
+</section>
+
+<section id="sop-choir">
+  <h2>合唱 SOP</h2>
+  <p class="muted">做完「共用的前三步」之後，接著做：</p>
+  <h3>第一天（請大人陪 20 分鐘）</h3>
+  <ol class="steps"><li><b>起音</b>：到「調音」頁選「合唱起音器」，按「主和弦」聽調性，再唱一個長音，看指針有沒有在中間。</li><li><b>發聲練習</b>：用初學模式唱一次「發聲練習」。唱得舒服後，用「移調」升高半音再唱。</li><li><b>分部練習</b>：「小星星（二部合唱）」在「我的聲部」選自己的聲部（女高或女低），用進階模式唱，其他聲部會當伴奏。</li><li><b>跟唱</b>：到「跟唱」頁，錄一段老師的清唱當標準，或貼 YouTube 歌曲，按「開始聽我唱」。</li></ol>
+  <h3>每天練琴（約 30 分鐘）</h3>
+  <ol class="steps"><li><b>發聲練習</b>一次。</li><li><b>起音</b>：用合唱起音器唱準自己聲部的第一個音。</li><li><b>練合唱曲</b>：選自己的聲部，先單獨唱準（關掉其他聲部伴奏），再打開伴奏一起唱。</li><li><b>跟唱</b>：跟著老師的清唱錄音或 YouTube 唱一次。</li></ol>
+  <div class="note"><b>比賽前</b>　合唱比賽前，在「我的聲部」唱自己的部、打開「背譜」練習。咬字、音色、表情，請照指揮老師的要求。</div>
 </section>
 
 <section id="prepare">

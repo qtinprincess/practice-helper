@@ -7,7 +7,7 @@
 <meta name="description" content="比賽前在家練習的小幫手：檢查音準與節奏、記錄進步。悠樂媽媽 製作。">
 <meta name="author" content="悠樂媽媽">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <style>
 /* 版面概念：一張安靜的譜架。紙白的樂譜是主角，控制列像譜架下緣的一條細木條；
    顏色只留給燈號與音準方向，其他全部是雲杉綠與石墨灰。 */
@@ -294,12 +294,101 @@ label.btn{cursor:pointer}
   .tempo input[type=range]{width:110px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ================= 活潑版：圓圓的字、明亮的顏色、像遊戲一樣的按鈕 =================
+   版面概念：遊戲關卡地圖。紙白的樂譜仍是主角，周圍換上葡萄紫、天空藍、陽光黃三個主色，
+   按鈕有厚厚的底邊像可以按下去的遊戲按鍵；燈號的綠黃紅只用在對錯。 */
+:root{
+  --bg:#f4f6ff; --surface:#ffffff; --sunk:#eef1fb; --ink:#26304a; --muted:#66708a; --line:#dfe4f3;
+  --accent:#6c4cf5; --accent-soft:#efeaff; --on-accent:#ffffff; --rosin:#ff8a3d;
+  --sky:#2fa8ff; --sun:#ffc93c; --pink:#ff6fa5;
+  --display:"Huninn","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --r:18px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#171a2b; --surface:#21253a; --sunk:#1b1f33; --ink:#eef0fb; --muted:#a3a9c6; --line:#33395a;
+  --accent:#a593ff; --accent-soft:#2c2850; --on-accent:#16122e; --rosin:#ffad6e; --sky:#6cc2ff; --sun:#ffd76b; --pink:#ff94bd}}
+:root[data-theme="dark"]{
+  --bg:#171a2b; --surface:#21253a; --sunk:#1b1f33; --ink:#eef0fb; --muted:#a3a9c6; --line:#33395a;
+  --accent:#a593ff; --accent-soft:#2c2850; --on-accent:#16122e; --rosin:#ffad6e; --sky:#6cc2ff; --sun:#ffd76b; --pink:#ff94bd}
+body{background:var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cg fill='%236c4cf5' fill-opacity='.05' font-size='22' font-family='serif'%3E%3Ctext x='14' y='34'%3E%E2%99%AA%3C/text%3E%3Ctext x='96' y='70'%3E%E2%99%AB%3C/text%3E%3Ctext x='40' y='128'%3E%E2%99%A9%3C/text%3E%3Ctext x='124' y='148'%3E%E2%99%AA%3C/text%3E%3C/g%3E%3C/svg%3E")}
+h1,h2,h3,.brand,.modes b,.scorebig b,.kpi .v,.tnote{font-family:var(--display);font-weight:400;letter-spacing:.02em}
+h1{font-size:clamp(26px,3.6vw,36px)}
+.brand{font-size:21px}
+.brand i{width:34px;height:34px;border:0;background:linear-gradient(135deg,var(--accent),var(--pink));color:#fff;font-size:17px;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+.top{background:color-mix(in srgb,var(--surface) 90%,transparent);border-bottom:0;box-shadow:0 4px 18px rgba(60,50,140,.08)}
+nav button,nav .navlink{font-weight:700;color:var(--muted);transition:transform .12s}
+nav button:hover{transform:translateY(-1px);color:var(--ink)}
+nav button[aria-current="page"]{background:var(--accent);color:var(--on-accent);box-shadow:0 3px 0 color-mix(in srgb,var(--accent) 60%,#000)}
+nav button[data-view="home"]{color:var(--rosin)}
+nav button[data-view="home"][aria-current="page"]{background:var(--rosin);color:#fff;box-shadow:0 3px 0 #c7621f}
+.card{border:0;box-shadow:0 2px 0 var(--line),0 8px 24px rgba(60,50,140,.06)}
+.btn{border-radius:14px;border:2px solid var(--line);font-weight:700;box-shadow:0 3px 0 var(--line);transition:transform .08s,box-shadow .08s}
+.btn:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+.btn:active:not(:disabled){transform:translateY(3px);box-shadow:0 0 0 var(--line)}
+.btn.primary{background:var(--accent);border-color:var(--accent);box-shadow:0 4px 0 color-mix(in srgb,var(--accent) 60%,#000)}
+.btn.primary:active:not(:disabled){box-shadow:0 0 0 transparent}
+#btnStart{background:linear-gradient(180deg,#38c172,#2fa65f);border-color:#2fa65f;box-shadow:0 4px 0 #1f7a44;font-size:16px;padding:10px 20px}
+.chip{border:0;background:var(--accent-soft);color:var(--accent);font-weight:700}
+.modes{border:0;gap:10px;background:none;overflow:visible}
+.modes button{border:2px solid var(--line)!important;border-radius:18px;background:var(--surface);box-shadow:0 3px 0 var(--line)}
+.modes button[data-mode="beginner"] b{color:#2fa65f}
+.modes button[data-mode="advanced"] b{color:var(--sky)}
+.modes button[data-mode="contest"] b{color:var(--rosin)}
+.modes button[aria-pressed="true"]{border-color:var(--accent)!important;background:var(--accent-soft);box-shadow:0 3px 0 var(--accent)}
+.modes button[aria-pressed="true"] b{color:var(--accent)}
+.rangebar{border-radius:14px;background:var(--surface);box-shadow:0 2px 0 var(--line)}
+.score-wrap{border:0;border-radius:20px;box-shadow:0 2px 0 var(--line),0 10px 30px rgba(60,50,140,.08)}
+.scorebig b{font-size:64px;background:linear-gradient(135deg,var(--accent),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+.coach{border-radius:16px;background:linear-gradient(135deg,var(--accent-soft),color-mix(in srgb,var(--sun) 18%,var(--surface)))}
+.coach h3{color:var(--accent)}
+.speak{border:0;background:var(--sun);color:#5a3b00;box-shadow:0 3px 0 #d9a41f;font-weight:700}
+.starpill{border:0;background:color-mix(in srgb,var(--sun) 30%,var(--surface));color:#7a5200;font-weight:700}
+.voicebtn{border-radius:999px}
+.micpill{border:0;box-shadow:0 2px 0 var(--line)}
+.kpi .v{color:var(--accent)}
+.b-item{border-radius:14px;border-width:2px}
+.b-item.pass{background:color-mix(in srgb,#38c172 14%,var(--surface));border-color:#38c172}
+.issues li{border-radius:12px}
+.site-foot{border-top:0}
+
+/* 從這裡開始 */
+.home-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.home-hero h1{font-size:clamp(28px,4.4vw,42px)}
+.inst-pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:20px 0}
+.inst-card{border:3px solid var(--line);background:var(--surface);border-radius:24px;padding:18px 10px 14px;display:flex;flex-direction:column;align-items:center;gap:8px;box-shadow:0 5px 0 var(--line);transition:transform .12s}
+.inst-card:hover{transform:translateY(-3px) rotate(-1deg)}
+.inst-card svg{width:72px;height:72px}
+.inst-card b{font-family:var(--display);font-weight:400;font-size:24px}
+.inst-card.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 5px 0 var(--accent)}
+.home-hint{text-align:center;font-family:var(--display);font-size:22px;color:var(--muted);margin:30px 0}
+.home-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+.home-card{padding:20px 22px}
+.home-card.done{background:color-mix(in srgb,#38c172 8%,var(--surface))}
+.hc-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.hc-top h2{font-size:21px}
+.hc-badge{font-family:var(--display);font-size:20px;background:var(--accent);color:var(--on-accent);border-radius:999px;padding:2px 14px}
+.hc-bar{height:12px;border-radius:6px;background:var(--sunk);overflow:hidden;margin:12px 0 8px}
+.hc-bar b{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--accent),var(--pink));transition:width .4s}
+.hc-bar.day b{background:linear-gradient(90deg,var(--sky),#38c172)}
+ol.sop{list-style:none;padding:0;margin:8px 0;display:grid;gap:10px}
+ol.sop li{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border-radius:16px;background:var(--sunk)}
+ol.sop li.ok{background:color-mix(in srgb,#38c172 14%,var(--surface))}
+.sop-n{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-size:18px;background:var(--surface);color:var(--accent);box-shadow:0 2px 0 var(--line)}
+ol.sop li.ok .sop-n{background:#38c172;color:#fff;box-shadow:0 2px 0 #1f7a44}
+.sop-t{font-size:15px;line-height:1.55}
+ol.sop li.ok .sop-t{color:var(--muted)}
+.home-tip{font-size:14px;margin:12px 0 0}
+@media (max-width:860px){.home-grid{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:560px){.top{position:static}.top-in{gap:8px 12px}nav button,nav .navlink{padding:5px 9px}}
+@media (max-width:520px){ol.sop li{grid-template-columns:34px minmax(0,1fr)}ol.sop li .btn{grid-column:2;justify-self:start}.inst-card svg{width:54px;height:54px}.inst-card b{font-size:19px}}
 </style>
 </head>
 <body>
 <header class="top"><div class="top-in">
   <div class="brand"><i>琴</i>練琴小幫手</div>
   <nav aria-label="主選單">
+    <button data-view="home">從這裡開始</button>
     <button data-view="practice" aria-current="page">練習</button>
     <button data-view="basics">基本功</button>
     <button data-view="sing">跟唱</button>
@@ -392,6 +481,9 @@ label.btn{cursor:pointer}
 
   <div class="report" id="report"></div>
 </section>
+
+<!-- ============ 從這裡開始 ============ -->
+<section id="v-home" hidden></section>
 
 <!-- ============ 基本功 ============ -->
 <section id="v-basics" hidden></section>
