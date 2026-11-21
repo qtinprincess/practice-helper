@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>練琴小幫手使用說明書</title>
+<meta name="author" content="悠樂媽媽">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;700&display=swap">
+<style>
+/* 版面：和練琴小幫手同一套譜架風格。左邊窄欄放章節目錄，右邊是閱讀欄；步驟用圓圈數字，因為順序本身就是內容。 */
+:root{
+  --bg:#f3f4f2; --surface:#ffffff; --sunk:#eceeeb; --ink:#1c211f; --muted:#5f6964; --line:#dde1de;
+  --accent:#2d5a4c; --accent-soft:#e3ece8; --rosin:#a8742c;
+  --ok:#2f9e5b; --warn:#d49a12; --bad:#cf4339; --sharp:#e0782a; --flat:#2f6fbf; --paper:#fdfdfb; --paper-ink:#1c211f;
+  --display:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121614; --surface:#1a1f1d; --sunk:#151917; --ink:#e6ebe8; --muted:#9aa59f; --line:#2b332f;
+  --accent:#86c4ad; --accent-soft:#20302a; --rosin:#d4a25c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121614; --surface:#1a1f1d; --sunk:#151917; --ink:#e6ebe8; --muted:#9aa59f; --line:#2b332f;
+  --accent:#86c4ad; --accent-soft:#20302a; --rosin:#d4a25c; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.8 var(--body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding-block:40px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;grid-template-columns:220px minmax(0,1fr);gap:48px}
+h1,h2,h3{font-family:var(--display);font-weight:700;letter-spacing:.02em;text-wrap:balance;margin:0}
+h1{font-size:clamp(30px,5vw,44px);line-height:1.25}
+h2{font-size:26px;margin-bottom:6px}
+h3{font-size:18px;margin:22px 0 6px}
+p{margin:8px 0}
+a{color:var(--accent)}
+.eyebrow{font-size:12px;letter-spacing:.16em;color:var(--muted)}
+.muted{color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+b,strong{font-weight:700}
+.ui{display:inline-block;font-size:14px;font-weight:500;border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:0 8px;line-height:1.7;white-space:nowrap}
+.ui.pri{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+kbd{font:13px ui-monospace,Consolas,monospace;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 6px;background:var(--surface)}
+
+nav.toc{position:sticky;top:calc(24px + env(safe-area-inset-top,0px));align-self:start;font-size:14px}
+nav.toc ol{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:2px;counter-reset:t}
+nav.toc li{counter-increment:t;margin:0;line-height:1.5}
+@media (max-width:860px){nav.toc{font-size:13.5px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}nav.toc a{padding:3px 6px}}
+nav.toc a{display:block;padding:4px 10px;border-radius:6px;color:var(--muted);text-decoration:none}
+nav.toc a:hover{background:var(--surface);color:var(--ink)}
+nav.toc a::before{content:counter(t) "　";color:var(--accent);font-variant-numeric:tabular-nums}
+
+main{min-width:0}
+section{padding-block:36px 8px;border-top:1px solid var(--line)}
+section:first-of-type{border-top:0;padding-top:0}
+.lead{font-size:18px;color:var(--muted);max-width:60ch;margin-top:14px}
+.who{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:24px}
+.who div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.who b{font-family:var(--display);font-size:17px}
+
+/* 五步驟 */
+.five{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:12px;counter-reset:f}
+.five li{counter-increment:f;display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.five li::before{content:counter(f);width:36px;height:36px;border-radius:50%;background:var(--accent);color:var(--bg);display:grid;place-items:center;font-family:var(--display);font-size:18px;font-weight:700}
+.five b{font-family:var(--display);font-size:18px}
+.five p{margin:2px 0 0;color:var(--muted);font-size:15px}
+
+ol.steps{padding-left:0;list-style:none;counter-reset:s;margin:10px 0}
+ol.steps>li{counter-increment:s;position:relative;padding-left:34px;margin:10px 0;max-width:66ch}
+ol.steps>li::before{content:counter(s);position:absolute;left:0;top:3px;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--accent);color:var(--accent);font-size:12px;font-weight:700;display:grid;place-items:center}
+ul{padding-left:22px;max-width:66ch}
+li{margin:4px 0}
+
+.note{background:var(--accent-soft);border-radius:10px;padding:14px 18px;margin:16px 0;max-width:70ch;font-size:15px}
+.note b{color:var(--accent)}
+.warnbox{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:6px;padding:12px 16px;margin:16px 0;max-width:70ch;font-size:15px}
+
+/* 燈號示意 */
+.lamps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0}
+.lamp{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px}
+.lamp i{display:inline-block;width:16px;height:16px;border-radius:50%;vertical-align:-2px;margin-right:8px}
+.lamp b{font-family:var(--display);font-size:18px}
+.lamp p{font-size:14px;color:var(--muted);margin:6px 0 0}
+.sheet{background:var(--paper);color:var(--paper-ink);border:1px solid var(--line);border-radius:10px;padding:10px;overflow-x:auto;margin:14px 0}
+.sheet svg{display:block;min-width:560px;width:100%;height:auto}
+.keys{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14px;color:var(--muted)}
+.keys i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-weight:500;color:var(--muted);font-size:13px;letter-spacing:.04em}
+td.num{white-space:nowrap}
+.tbl{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px;margin:14px 0}
+tr:last-child td{border-bottom:0}
+
+.modes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0}
+.mode{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:6px}
+.mode b{font-family:var(--display);font-size:19px;color:var(--accent)}
+.mode .when{font-size:13px;color:var(--muted)}
+.mode .pass{margin-top:auto;font-size:14px;border-top:1px dashed var(--line);padding-top:8px}
+.path{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:15px;margin:8px 0}
+.path span{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:2px 12px}
+.path em{font-style:normal;color:var(--muted)}
+
+.fix{display:grid;gap:10px;margin:14px 0}
+.fix div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 16px;font-size:15px}
+.fix code{font-family:var(--body);font-weight:700}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:22px 24px;margin:18px 0}
+.daily{display:grid;gap:8px;list-style:none;padding:0;margin:12px 0 0;max-width:none}
+.daily li{display:flex;gap:12px;align-items:flex-start}
+.daily li::before{content:"";flex:none;width:18px;height:18px;border:1.5px solid var(--accent);border-radius:4px;margin-top:5px}
+.daily small{color:var(--muted)}
+
+dl.faq{margin:10px 0}
+dl.faq dt{font-weight:700;margin-top:16px}
+dl.faq dd{margin:4px 0 0;color:var(--muted);max-width:68ch}
+
+footer{margin-top:48px;font-size:13px;color:var(--muted)}
+
+@media (max-width:860px){
+  .wrap{grid-template-columns:minmax(0,1fr);gap:24px}
+  nav.toc{position:static}
+  nav.toc ol{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .lamps,.modes{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:520px){
+  .who{grid-template-columns:minmax(0,1fr)}
+  .fix div{grid-template-columns:minmax(0,1fr);gap:4px}
+  nav.toc ol{grid-template-columns:minmax(0,1fr)}
+}
+</style>
+
+<div class="wrap">
+<nav class="toc" aria-label="目錄">
+  <div class="eyebrow">目錄</div>
+  <ol>
+    <li><a href="#quick">五步驟開始練</a></li>
+    <li><a href="#prepare">準備與安裝</a></li>
+    <li><a href="#first">第一次設定</a></li>
+    <li><a href="#lights">看懂燈號與顏色</a></li>
+    <li><a href="#modes">三種模式</a></li>
+    <li><a href="#fix">錯誤怎麼改</a></li>
+    <li><a href="#coach">小琴陪你加強</a></li>
+    <li><a href="#basics">基本功</a></li>
+    <li><a href="#symbols">點記號看說明</a></li>
+    <li><a href="#tree">我的音樂樹</a></li>
+    <li><a href="#choir">合唱與跟唱</a></li>
+    <li><a href="#kids">小琴與語音</a></li>
+    <li><a href="#refs">示範錄音與伴奏</a></li>
+    <li><a href="#score">加入新樂譜</a></li>
+    <li><a href="#record">練習紀錄</a></li>
+    <li><a href="#standard">比賽模式的標準</a></li>
+    <li><a href="#teacher">給老師與指揮</a></li>
+    <li><a href="#faq">常見問題</a></li>
+  </ol>
+</nav>
+
+<main>
+<section id="top">
+  <div class="eyebrow">小提琴・直笛・合唱　比賽前在家練習的好幫手</div>
+  <h1>練琴小幫手<br>使用說明書</h1>
+  <p class="lead">上完課回家自己練的時候，小幫手會陪在旁邊聽：在樂譜上亮綠、黃、紅燈，告訴孩子「第幾小節、第幾個音、偏高還是慢了」，讓孩子知道自己練得對不對、有沒有進步。比賽模式的檢查標準參考學生音樂比賽全國賽對音準與節奏的要求。</p>
+  <div class="note"><b>小幫手不是老師</b>　它只能客觀檢查音準和節奏的對錯，並記錄練習。怎麼拉、怎麼唱、指法弓法、樂句與音樂表現，都請以指導老師、指揮老師的教學為準。小幫手的建議和老師不一樣時，請聽老師的。</div>
+  <div class="who">
+    <div><b>小朋友</b><p class="muted">先看「五步驟開始練」。還不識字的小朋友，按畫面上的「聽說明」或點右下角的小琴，小琴會用聲音教你。</p></div>
+    <div><b>老師與家長</b><p class="muted">請看「準備與安裝」「第一次設定」幫孩子設定好，再看「比賽模式的標準」「給老師與指揮」了解檢查標準和如何追蹤進度。</p></div>
+  </div>
+</section>
+
+<section id="quick">
+  <h2>五步驟開始練</h2>
+  <p class="muted">設定好之後，每天練琴只要這五步。</p>
+  <ol class="five">
+    <li><div><b>夾好麥克風，按右上角「開啟」</b><p>拉一個音，看到右上角綠色的音量條會動，就表示聽得到。</p></div></li>
+    <li><div><b>到「調音」把四條弦調準</b><p>每條弦都調到指針在正中間、字變綠色才算好。</p></div></li>
+    <li><div><b>選曲子，按「聆聽示範」</b><p>先聽一次正確的旋律。只想聽一段，就先點那一小節再按。</p></div></li>
+    <li><div><b>選模式，按「開始練習」</b><p>新曲子用「初學」，熟了用「進階」，上台前用「比賽」。電腦也可以按 <kbd>空白鍵</kbd> 開始或停止。</p></div></li>
+    <li><div><b>看燈號和下面的說明，再練一次</b><p>紅燈的小節要再練。按「小琴陪你加強」，小琴會陪你一小段一小段練。</p></div></li>
+  </ol>
+</section>
+
+<section id="prepare">
+  <h2>準備與安裝</h2>
+  <h3>需要的東西</h3>
+  <ul>
+    <li><b>電腦</b>（Windows 或 Mac），使用 <b>Chrome</b> 或 <b>Edge</b> 瀏覽器。</li>
+    <li><b>夾式麥克風</b>（直播用的那種，有線或無線都可以）。</li>
+    <li><b>耳機</b>（建議）：節拍器和示範旋律從耳機出來，麥克風只會收到琴聲，判斷最準。</li>
+    <li><b>網路</b>：開啟時要載入樂譜顯示元件，請保持連線。</li>
+  </ul>
+  <h3>安裝</h3>
+  <ol class="steps">
+    <li><b>網站版（建議）</b>：用老師或家長給的網址打開即可，手機、平板、電腦都能用，不用安裝。第一次使用時，瀏覽器會問能不能用麥克風，請按「允許」。</li>
+    <li><b>電腦檔案版</b>：把整個資料夾複製到電腦，用 Chrome 或 Edge 開啟資料夾裡的 <b>index.html</b>。資料夾裡的 <b>js</b> 資料夾不能分開。</li>
+    <li>建議把這個頁面加入書籤，下次直接點書籤就能開。</li>
+  </ol>
+  <div class="warnbox">平板和手機目前無法直接開啟這個資料夾裡的檔案，請使用電腦。</div>
+  <h3>麥克風怎麼夾</h3>
+  <ul>
+    <li><b>小提琴</b>：夾在左側衣領或肩膀附近，麥克風朝向琴身，距離約 15–30 公分。不要碰到琴或弓。</li>
+    <li><b>直笛</b>：夾在胸前衣領，朝向笛尾，不要對著嘴巴（呼氣聲會干擾判斷）。</li>
+  </ul>
+</section>
+
+<section id="first">
+  <h2>第一次設定</h2>
+  <p class="muted">只要做一次。換電腦、換麥克風或換耳機時再做一次。都在上方「設定」頁。</p>
+  <ol class="steps">
+    <li><b>允許麥克風</b>：按右上角 <span class="ui pri">開啟</span>，瀏覽器問「要允許使用麥克風嗎」，選允許。有多支麥克風時，在「輸入裝置」選夾式麥克風。</li>
+    <li><b>測量環境噪音</b>：按 <span class="ui">測量環境噪音（安靜 2 秒）</span>，這 2 秒內保持安靜。小幫手會記住環境有多吵，之後不會把雜音當成琴聲。</li>
+    <li><b>延遲校正</b>：戴上平常練琴用的耳機，按 <span class="ui">開始校正</span>。先聽到 2 聲預備，接著 8 聲，請跟著拍手（或用弓拉短音）。顯示「已校正：○○ 毫秒」就完成了。<b>這一步決定節奏判斷準不準，請一定要做。</b></li>
+    <li><b>標準音 A</b>：依比賽伴奏鋼琴或老師指示，選 440 或 442 Hz。</li>
+  </ol>
+</section>
+
+<section id="lights">
+  <h2>看懂燈號與顏色</h2>
+  <p>每一小節右上角有一顆燈。拉完一小節，燈就會亮。</p>
+  <div class="lamps">
+    <div class="lamp"><b><i style="background:var(--ok)"></i>綠燈</b><p>這一小節的音準和節奏都在標準內，完全正確。</p></div>
+    <div class="lamp"><b><i style="background:var(--warn)"></i>黃燈</b><p>稍微不準。看下方說明，修正後再拉一次。</p></div>
+    <div class="lamp"><b><i style="background:var(--bad)"></i>紅燈</b><p>錯音、漏音，或偏差太大。這一小節需要重拉。</p></div>
+  </div>
+  <p>每個音符本身也會變色，音符上方的數字是偏了幾 cents，下方的箭頭是節奏問題：</p>
+  <div class="sheet" role="img" aria-label="示意：一小節裡有正確、偏高、偏低、錯音和延遲的音符">
+    <svg viewBox="0 0 640 150">
+      <g stroke="#1c211f" stroke-width="1">
+        <line x1="20" x2="620" y1="50" y2="50"/><line x1="20" x2="620" y1="62" y2="62"/><line x1="20" x2="620" y1="74" y2="74"/><line x1="20" x2="620" y1="86" y2="86"/><line x1="20" x2="620" y1="98" y2="98"/>
+        <line x1="20" x2="20" y1="50" y2="98"/><line x1="620" x2="620" y1="50" y2="98" stroke-width="2"/>
+      </g>
+      <g>
+        <ellipse cx="90" cy="92" rx="7.5" ry="5.5" fill="#2f9e5b" transform="rotate(-20 90 92)"/><line x1="97" x2="97" y1="90" y2="52" stroke="#2f9e5b" stroke-width="1.5"/>
+        <ellipse cx="200" cy="80" rx="7.5" ry="5.5" fill="#e0782a" transform="rotate(-20 200 80)"/><line x1="207" x2="207" y1="78" y2="40" stroke="#e0782a" stroke-width="1.5"/>
+        <text x="200" y="28" text-anchor="middle" font-size="13" font-weight="700" fill="#e0782a">+18</text>
+        <ellipse cx="310" cy="74" rx="7.5" ry="5.5" fill="#2f6fbf" transform="rotate(-20 310 74)"/><line x1="317" x2="317" y1="72" y2="34" stroke="#2f6fbf" stroke-width="1.5"/>
+        <text x="310" y="24" text-anchor="middle" font-size="13" font-weight="700" fill="#2f6fbf">−14</text>
+        <ellipse cx="420" cy="68" rx="7.5" ry="5.5" fill="#cf4339" transform="rotate(-20 420 68)"/><line x1="413" x2="413" y1="70" y2="108" stroke="#cf4339" stroke-width="1.5"/>
+        <ellipse cx="530" cy="80" rx="7.5" ry="5.5" fill="#1c211f" transform="rotate(-20 530 80)"/><line x1="537" x2="537" y1="78" y2="40" stroke="#1c211f" stroke-width="1.5"/>
+        <text x="530" y="128" text-anchor="middle" font-size="15" font-weight="700" fill="#cf4339">→</text>
+      </g>
+      <g font-size="12" fill="#5f6964" text-anchor="middle">
+        <text x="90" y="146">正確</text><text x="200" y="146">偏高 18 cents</text><text x="310" y="146">偏低 14 cents</text><text x="420" y="146">錯音／漏音</text><text x="530" y="146">音對但延遲</text>
+      </g>
+    </svg>
+  </div>
+  <div class="keys">
+    <span><i style="background:var(--ok)"></i>綠：正確</span><span><i style="background:var(--sharp)"></i>橙：偏高</span><span><i style="background:var(--flat)"></i>藍：偏低</span><span><i style="background:var(--bad)"></i>紅：錯音・漏音</span>
+    <span><b>←</b> 提前　<b>→</b> 延遲　<b>⌐</b> 音太短</span>
+  </div>
+  <div class="note"><b>什麼是 cents？</b>　100 cents 等於一個半音（例如 A 到 A♯）。10 cents 是訓練有素的耳朵聽得出來的差距，也是比賽模式綠燈的標準。</div>
+</section>
+
+<section id="modes">
+  <h2>三種模式</h2>
+  <div class="path"><span>初學模式</span><em>拉對每個音之後</em><span>進階模式</span><em>慢速全綠之後</em><span>比賽模式</span></div>
+  <div class="modes">
+    <div class="mode"><b>初學模式</b><span class="when">第一次練新曲子</span>
+      <p>游標停在每個音上，等你拉對才往下走，可以慢慢想、隨時停下來。畫面會寫出要拉哪個音和指法。想不起來時按 <span class="ui">提示音</span> 聽一次。</p>
+      <p class="muted" style="font-size:14px">只判斷音準：±25 cents 內綠燈。</p>
+      <div class="pass">過關：整首拉完，沒有紅燈。</div></div>
+    <div class="mode"><b>進階模式</b><span class="when">音都會了，開始對節奏</span>
+      <p>先聽一小節預備拍，再跟著節拍器拉。音準和節奏同時判斷。可以把速度調慢、勾選「循環」反覆練同一段。</p>
+      <p class="muted" style="font-size:14px">音準 ±15 cents、起音 ±60 毫秒內綠燈。</p>
+      <div class="pass">過關：原速（100%）連續 3 次全綠。</div></div>
+    <div class="mode"><b>比賽模式</b><span class="when">上台前的模擬考</span>
+      <p>從第一小節連續拉到最後一小節，中途不停，沒有伴奏旋律提示。採用參考全國賽要求的嚴格標準。</p>
+      <p class="muted" style="font-size:14px">音準 ±10 cents、起音 ±40 毫秒內綠燈。</p>
+      <div class="pass">達標：全曲綠燈。代表音準與節奏通過檢查，音樂表現請老師再聽聽看。</div></div>
+  </div>
+  <h3>選範圍、循環、調速度</h3>
+  <ul>
+    <li><b>只練一小節</b>：在樂譜上點那一小節，它會被框起來。</li>
+    <li><b>練一段</b>：先點起點小節，按 <span class="ui">延伸範圍</span>，再點終點小節（電腦可以按住 <kbd>Shift</kbd> 點）。按 <span class="ui">改回全曲</span> 取消。</li>
+    <li><b>速度</b>：拖動速度滑桿，40% 到 120%。比賽前一定要用 100% 練。</li>
+    <li><b>節拍器、伴奏旋律、循環</b>：在速度旁邊勾選。比賽模式會自動關掉伴奏和循環。</li>
+  </ul>
+</section>
+
+<section id="fix">
+  <h2>錯誤怎麼改</h2>
+  <p>報告的「需要改的地方」會一條一條寫出來，點一下就會跳到那一小節。常見的說明和改法：</p>
+  <div class="fix">
+    <div><code>偏高 18 cents</code><span>小提琴：按弦的手指往琴頭方向（靠近自己）挪一點點。直笛：吹氣輕一點。</span></div>
+    <div><code>偏低 14 cents</code><span>小提琴：手指往琴橋方向挪一點點。直笛：吹氣稍微加強，檢查手指有沒有把孔蓋滿。</span></div>
+    <div><code>拉成 G♯4（應為 G4）</code><span>按錯音了。看報告下方的「參考指法」，先用初學模式把這個音拉對。常見原因是忘了調號的升降記號。</span></div>
+    <div><code>漏音：沒有聽到這個音</code><span>可能沒拉到、弓壓太輕，或換弦時弓碰到了別條弦。</span></div>
+    <div><code>提前 0.12 秒</code><span>搶拍了。心裡數拍子，等到拍點再出弓。可以把速度調慢練。</span></div>
+    <div><code>延遲 0.06 秒</code><span>太晚進來。提早準備下一個音的手指，換弦動作再快一點。</span></div>
+    <div><code>四分音符演奏時間不足</code><span>音太早停掉。弓要一直拉到下一個音開始，數滿拍子。</span></div>
+    <div><code>休止符沒有停下來</code><span>休止符的時候要讓聲音停住，把弓停在弦上或離弦。</span></div>
+    <div><code>雙音完全五度太寬 12 cents：把 A4 調低約 12 cents</code><span>兩個音的距離太大。照建議把那一個音的手指往琴頭方向挪一點，直到聽不到「嗡嗡」聲。「太窄」則相反。</span></div>
+    <div><code>雙音裡的 A4 沒有聽到</code><span>只拉到一條弦，或另一個音按錯。弓要同時壓在兩條弦上。</span></div>
+    <div><code>先拉錯 2 次（聽到 A♯4）</code><span>初學模式才有：表示拉對之前試錯了幾次，以及錯成哪個音。</span></div>
+  </div>
+  <p>報告上方還有整體分析：<b>音準平均誤差</b>、整體偏高或偏低的傾向、<b>節奏穩定度</b>（毫秒數越小越穩）、習慣搶拍或晚進、整首<b>越拉越快</b>或<b>越拉越慢</b>。</p>
+  <p>按 <span class="ui">聽自己的演奏</span> 可以重聽剛剛的錄音，游標會跟著走；按 <span class="ui">聽示範（同一段）</span> 比較正確的旋律。</p>
+</section>
+
+<section id="coach">
+  <h2>小琴陪你加強</h2>
+  <p>拉完之後，報告會出現「小琴的練習小撇步」，列出最需要加強的小節。按 <span class="ui pri">小琴陪你加強</span>（如果老師有指定不同的練法，請照老師的方式）：</p>
+  <ol class="steps">
+    <li>自動選好最弱的一段（紅燈優先），速度降到 70%，反覆循環。</li>
+    <li>連續 3 次綠燈，速度自動加 10%。</li>
+    <li>到 100% 也連續 3 次綠燈，這一段過關，自動換下一段。</li>
+    <li>全部過關後，用比賽模式從頭完整拉一次。</li>
+  </ol>
+  <p class="muted">中途想休息就按 <span class="ui">停止</span>，下次按「開始練習」會從原本那一段繼續。</p>
+</section>
+
+<section id="basics">
+  <h2>基本功</h2>
+  <p>上方的 <span class="ui">基本功</span> 頁，依程度分成 5 級：空弦長弓與換弦、一個八度音階、琶音、兩個八度、三個八度（比賽常考）。直笛有長音、吐音和音階；合唱有長音和和弦琶音。</p>
+  <ol class="steps">
+    <li>選樂器，按每一項的 <span class="ui pri">練習</span>，會自動打開練習頁並設好模式。</li>
+    <li>過關條件：第 1–4 級用進階模式、原速、整首<b>全部綠燈</b>；第 5 級要比賽模式全綠。過關會得到 5 顆星。</li>
+    <li>頁面上方會顯示已過關幾項、今天練了幾次、連續練習幾天。每天的目標是基本功 3 次。</li>
+  </ol>
+  <div class="warnbox">需要換把位的音階，小幫手只提示第一把位參考指法；換把位的指法和練習順序，請照老師的安排。</div>
+</section>
+
+<section id="symbols">
+  <h2>點記號看說明</h2>
+  <p>按樂譜上方的 <span class="ui">點記號看說明</span>，再點樂譜上任何地方：譜號、調號、拍號、音符、休止符、反覆記號、一房二房、D.C.、速度記號、漸慢、斷奏、延長記號、力度、指法、弓法、歌詞……都會跳出說明，語音開著時小琴也會唸出來。按 <span class="ui">聽聽看</span> 可以聽那個音。</p>
+  <p>老師可以在說明框按 <span class="ui">老師批註</span>，在音符上方寫提醒（例如「這裡換把位」）或改指法數字。</p>
+  <h3>小幫手看得懂的記號</h3>
+  <p>反覆記號與一二房、D.C.／D.S.／Fine／Coda（會照實際演奏順序評分）、速度記號與中途換速度、rit.／accel.／a tempo、延長記號（節拍器會等你）、斷奏（檢查有沒有拉短）、保持音、重音、顫音、圓滑線、連結線、力度與漸強漸弱、指法、上下弓、換氣記號、中途換拍號與調號、雙音、歌詞。</p>
+  <h3>其他顯示工具</h3>
+  <ul>
+    <li><b>譜下文字</b>：顯示歌詞、首調唱名或固定唱名。</li>
+    <li><b>移調</b>：整首升高或降低半音（合唱配合音域時好用）。</li>
+    <li><b>背譜</b>：遮一半、只留每行第一小節、或全部遮住，練習背譜。</li>
+    <li><b>節拍器打法</b>：每拍、只打第一拍，或「漸隱」（循環時越來越少，最後靠自己的拍子）。</li>
+    <li><b>持續主音</b>：一直響著主音和五度，用耳朵比對音準，這是老師常用的練耳方法。</li>
+  </ul>
+</section>
+
+<section id="tree">
+  <h2>我的音樂樹</h2>
+  <p>每個綠燈小節得 1 顆星，整首全綠多 3 顆，基本功過關多 5 顆。點上方的星星，可以看到自己的音樂樹：</p>
+  <p class="path"><span>小種子</span><em>→</em><span>小豆芽</span><em>→</em><span>小樹苗</span><em>→</em><span>長出花苞</span><em>→</em><span>開花了</span><em>→</em><span>結出音符果</span><em>→</em><span>音樂大樹</span></p>
+  <p>樹長大時，右下角的小琴也會變身：戴上紅色領結、音符帽、藍色披風，最後戴上金色皇冠。</p>
+</section>
+
+<section id="choir">
+  <h2>合唱與跟唱</h2>
+  <h3>有樂譜：合唱分部練習</h3>
+  <ul>
+    <li>匯入合唱的 MusicXML（聲部名稱有 Soprano／Alto／Tenor／Bass 或女高、女低、男高、男低，會自動辨認），在「我的聲部」選自己的聲部，其他聲部當伴奏。範例「小星星（二部合唱）」「發聲練習」可以先試。</li>
+    <li>人聲的容許度比樂器稍寬（例如比賽模式音準綠燈 ±15 cents），並會提醒人聲常見問題：起音從下面滑上來、尾音往下掉、聲音搖晃太大、越唱越低。</li>
+    <li>男高音照慣例寫在高音譜號、實際唱低八度，小幫手會自動換算。</li>
+    <li>調音頁的 <span class="ui">合唱起音器</span>：按「主和弦」聽調性，再按自己聲部的起音。</li>
+  </ul>
+  <h3>沒有樂譜：跟唱頁</h3>
+  <ol class="steps">
+    <li>到上方 <span class="ui">跟唱</span> 頁，上傳一段<b>清唱錄音</b>當標準，或按「現場錄一段」，請老師或自己先唱一次。</li>
+    <li>戴上耳機，按 <span class="ui pri">開始跟唱</span>，跟著錄音唱。灰色粗線是標準的旋律，彩色點是自己的聲音：綠＝準、黃＝差一點、紅＝偏離。</li>
+    <li>唱完會有分數，以及每一句偏高、偏低、慢了多少的提醒。男生唱女生的歌（差八度）也算對。</li>
+  </ol>
+  <div class="warnbox">請使用自己或老師錄的清唱，或有權使用的人聲音檔。流行歌的 mp3 有樂團伴奏，抓不到主旋律；YouTube 影片無法分析。有版權的歌曲，小幫手不會提供樂譜或歌詞。</div>
+</section>
+
+<section id="kids">
+  <h2>小琴與語音</h2>
+  <p>右下角的小琴是練琴的好朋友，適合幼兒園和低年級的小朋友。</p>
+  <ul>
+    <li><b>聽說明</b>：每一頁都有 <span class="ui">聽說明</span> 按鈕，點右下角的小琴也可以。小琴會用聲音說這一頁怎麼用。</li>
+    <li><b>唸出提示</b>：初學模式會唸出要拉哪一條弦、哪一根手指，例如「A 弦，空弦」。拉完會說哪一小節要改，例如「第 3 小節有一個音高了一點點，手指往後退一點點」。</li>
+    <li><b>鼓勵</b>：每個綠燈小節得 1 顆星，全部綠燈再加 3 顆並放彩帶；連續 5、10 小節綠燈會跳出慶祝動畫。星星累積會升級稱號：小豆芽 → 小琴童 → 小樂手 → 小首席 → 小音樂家 → 琴房大師。</li>
+    <li><b>幽默提醒</b>：亂拉、一直拉錯、太大聲、一直重來，或很久沒有聲音時，小琴會用好笑的話提醒，例如「弓好像在跳霹靂舞，請它乖乖走直線～」，並建議放慢速度或先聽示範。</li>
+    <li>上方的 <span class="ui">語音開</span> 可以關掉聲音；「設定」→「小琴與語音」可以把小琴藏起來。</li>
+  </ul>
+  <div class="warnbox">語音使用電腦內建的中文語音，請用 Chrome 或 Edge。第一次要先在頁面上點一下，瀏覽器才允許發出聲音。</div>
+</section>
+
+<section id="refs">
+  <h2>示範錄音與伴奏</h2>
+  <p>在練習頁的 <b>示範錄音・樂團伴奏</b> 面板設定。每一首曲子、每一個聲部可以各存一份示範錄音。</p>
+  <h3>老師拉奏版、網路 mp3</h3>
+  <ol class="steps">
+    <li><b>上傳</b>：按 <span class="ui">上傳錄音檔</span>，選 mp3、m4a 或 wav。<b>或是現場錄</b>：按 <span class="ui">錄老師示範</span>，聽完預備拍後請老師從第一小節拉到最後，拉完按 <span class="ui">停止錄音</span>。</li>
+    <li>小幫手會分析錄音，把每個音對到樂譜上，顯示「對齊可信度」。75% 以上表示對得很好；低於 50% 只能當聆聽用。</li>
+    <li>「聆聽示範」可以改成播放示範錄音，游標會跟著老師的速度走。</li>
+    <li>勾選 <b>練習時照錄音的速度和彈性評分</b>：學生的節奏改成和老師比，不是和節拍器比。老師的漸慢、彈性速度都會算進去，適合練樂句與音樂表情。</li>
+    <li>勾選 <b>同時播放錄音</b>：練習時耳機會播放老師的錄音一起拉（這時速度固定為原速）。</li>
+  </ol>
+  <div class="warnbox">對齊效果最好的是<b>單一樂器</b>、和樂譜同一個版本的錄音。有鋼琴或樂團伴奏的錄音、不同調或刪減段落的版本，可能對不起來。音準評分仍然用標準音高（不是照老師的音高），避免把錄音的誤差學起來。</div>
+  <h3>YouTube 連結</h3>
+  <p>可以把 YouTube 網址存在曲子裡，方便學生點開聆聽。YouTube 不提供音訊下載，所以<b>無法用來評分</b>；要對照評分，請改用錄音檔。</p>
+  <h3>樂團分部練習與伴奏</h3>
+  <ol class="steps">
+    <li>匯入含多個聲部的 MusicXML（例如樂團總譜或二重奏），或請 Claude 轉成有 parts 的小幫手格式。曲庫的範例「歡樂頌（二重奏）」可以先試。</li>
+    <li>在 <b>我的聲部</b> 選自己負責的聲部，樂譜會換成那一部。中提琴用中音譜號、大提琴用低音譜號顯示。</li>
+    <li>勾選 <b>其他聲部伴奏</b>，示範與練習時，其他聲部（含鋼琴伴奏）會用合成音一起演奏，可以調整音量。評分只看自己的聲部。</li>
+  </ol>
+</section>
+
+<section id="score">
+  <h2>加入新樂譜</h2>
+  <h3>紙本或照片樂譜</h3>
+  <ol class="steps">
+    <li>把樂譜拍清楚（整頁、不要歪、光線均勻），或使用 PDF。</li>
+    <li>上傳給 Claude，說：「幫我轉成練琴小幫手格式」。（請使用自己擁有或公版的樂譜。）要練直笛的話請一起說明是高音直笛或中音直笛。</li>
+    <li>到「曲庫」頁，把 Claude 給的文字貼進框框，按 <span class="ui pri">加入曲庫</span>。</li>
+    <li><b>一定要核對</b>：在練習頁對照原譜，看調號、拍號、每個音和節奏是否一樣，並按「聆聽示範」聽一次。有錯就告訴 Claude 第幾小節錯了，請它修正。</li>
+  </ol>
+  <h3>不用拍照的快速匯入</h3>
+  <ul>
+    <li><b>MuseScore.com</b>：公版曲（古典、民謠）可免費下載 MusicXML；有版權的曲子需要購買授權（MuseScore PRO）。</li>
+    <li><b>OpenScore</b>：公版樂譜，免費、可任意使用。放在 GitHub 上的檔案可以直接貼網址匯入。</li>
+    <li><b>IMSLP</b>：最大的公版樂譜庫，多數是 PDF，部分樂譜附 MusicXML。</li>
+    <li><b>只有 PDF</b>：用免費的 MuseScore 4「匯入 PDF」或 Audiveris 轉成 MusicXML。轉換常有小錯，匯入後一定要對照原譜。</li>
+    <li>曲庫頁可以<b>一次拖曳好幾個檔案</b>進來，也可以貼 MusicXML 的網址匯入（網站允許才行，不允許時請先下載再拖曳）。</li>
+  </ul>
+  <h3>MusicXML 檔</h3>
+  <p>用 MuseScore、Audiveris、PlayScore 等軟體匯出的 <b>.musicxml</b>、<b>.xml</b>、<b>.mxl</b> 檔，在曲庫頁「選擇檔案」就能直接加入。</p>
+  <div class="warnbox"><b>雙音</b>會分別檢查兩個音有沒有拉到，以及兩音之間的音程準不準（預設純律，見「全國賽標準」）。三個音以上的和弦會檢查相鄰的每一組音程。同一行譜上有多個聲部時，評分只取第一聲部。</div>
+</section>
+
+<section id="record">
+  <h2>練習紀錄</h2>
+  <p>每次練完都會自動記錄。到上方「紀錄」頁，選一首曲子就能看到：</p>
+  <ul>
+    <li><b>練習次數與時間</b>、最近一次分數。</li>
+    <li><b>改善幅度</b>：最早幾次和最近幾次的平均分數比較。</li>
+    <li><b>分數變化圖</b>：每個點是一次練習，顏色代表模式。</li>
+    <li><b>最常出錯的小節</b>：點一下直接去練那一小節。</li>
+    <li><b>常偏高或偏低的音</b>：例如「C♯5 +16」表示 C♯5 習慣拉高 16 cents，練音階時要特別注意。</li>
+    <li><b>節奏穩定度</b>變化，以及每一次練習的明細。</li>
+  </ul>
+  <p class="muted">分數算法：綠燈小節 100 分、黃燈 60 分、紅燈 0 分，取平均。</p>
+</section>
+
+<section id="standard">
+  <h2>比賽模式的標準</h2>
+  <p>小幫手的比賽模式參考學生音樂比賽全國賽對音準與節奏的要求來設定，是在家自我檢查用的標準，不代表正式比賽的評分。下面是三種模式的預設標準，老師可以在「設定」→「容許誤差」調整。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>模式</th><th>音準綠燈</th><th>音準黃燈</th><th>起音綠燈</th><th>起音黃燈</th><th>其他判斷</th></tr></thead>
+    <tbody>
+      <tr><td>初學</td><td class="num">±25 cents</td><td class="num">±50 cents</td><td>不判斷</td><td>不判斷</td><td>試錯 1–2 次黃燈、3 次以上紅燈</td></tr>
+      <tr><td>進階</td><td class="num">±15 cents</td><td class="num">±35 cents</td><td class="num">±60 毫秒</td><td class="num">±130 毫秒</td><td rowspan="2">音長不足 75% 黃燈、不足 45% 紅燈；休止符有聲音黃燈；錯音、漏音紅燈</td></tr>
+      <tr><td><b>比賽</b></td><td class="num"><b>±10 cents</b></td><td class="num">±25 cents</td><td class="num"><b>±40 毫秒</b></td><td class="num">±90 毫秒</td></tr>
+      <tr><td>雙音</td><td colspan="2">音程誤差，依各模式的音準標準</td><td colspan="2">同上（起音看音量變化）</td><td>預設純律；可在設定改平均律。八度、同音只能粗略判斷</td></tr>
+      <tr><td>調音器</td><td class="num">±3 cents</td><td class="num">±10 cents</td><td colspan="3">空弦調到綠色才算調準</td></tr>
+    </tbody>
+  </table></div>
+  <h3>比賽前的自我檢查清單</h3>
+  <ul>
+    <li>調音器四條弦都在 ±3 cents 內。</li>
+    <li>比賽模式、速度 100%、全曲綠燈。</li>
+    <li>音準平均誤差在 ±5 cents 內，沒有明顯偏高或偏低傾向。</li>
+    <li>節奏穩定度在 ±25 毫秒內，速度判斷為「速度穩定」。</li>
+    <li>不同天練習都能重現上面的結果（看紀錄頁分數變化）。</li>
+  </ul>
+  <div class="note"><b>注意</b>　這是音準與節奏的客觀檢核。音色、運弓、抖音、樂句與表情等音樂性，仍需要老師或錄音後自己聆聽判斷。</div>
+</section>
+
+<section id="teacher">
+  <div class="note"><b>給老師與指揮的話</b>　練琴小幫手是孩子回家練習時的小幫手，目的是讓孩子在家也知道對錯、願意多練，上課時老師能把時間花在音樂上。它不會、也不能取代老師的指導；以下工具都是讓老師更方便掌握孩子在家練習的情形。</div>
+  <h2>給老師</h2>
+  <h3>評分原理</h3>
+  <ul>
+    <li><b>音準引擎</b>：每秒約分析 90 次音高，判斷音名與八度，以每個音中段的中位數計算偏差（cents），避免起音和抖音影響判斷。</li>
+    <li><b>節奏引擎</b>：從音高變化或音量變化找出每個音真正開始的時間，和節拍器的拍點比較；另外檢查音長、休止符和整首速度是否越來越快或越來越慢。</li>
+    <li>兩個引擎各自評分，取較差的結果作為該音的燈號，再取小節內最差的音作為小節燈號。</li>
+    <li>開發測試時，用合成的小提琴音色故意加入偏高 18 cents、延遲 0.12 秒、錯一個半音、音長只有一半等錯誤，全部都正確判出；音高量測誤差在 1 cent 以內，拍點誤差約 ±15 毫秒。實際使用的準確度會受麥克風、環境噪音和延遲校正影響。</li>
+  </ul>
+  <h3>建議的課堂用法</h3>
+  <ol class="steps">
+    <li>上課時幫學生完成「第一次設定」，確認麥克風位置。</li>
+    <li>在曲庫頁的「老師：建立作業」設定曲子、小節、模式、速度和目標（例如進階模式全綠連續 3 次），產生作業代碼用 LINE 傳給學生；學生貼上後，練習頁會顯示作業和完成進度。</li>
+    <li>學生在「紀錄」頁按「下載一週練習報告」，可以把練習次數、分數變化、常錯小節傳給老師。</li>
+    <li><b>老師覆核燈號</b>：在練習報告按「老師覆核燈號」，依老師的聽感點小節修正燈號；累積 10 個小節以上，到「設定」→「評分校正」套用最符合老師標準的容許度。</li>
+    <li>設定頁可以選「表情音準」（導音略高不扣分）、模擬上台的時間限制與背譜、休息提醒時間、直笛指法系統（德式／英式）。</li>
+    <li>把指定曲目轉成小幫手格式，學生加入曲庫；也可以在曲庫按 <span class="ui">複製文字</span> 傳給其他學生。</li>
+    <li>指定練習方式，例如「進階模式 80% 連續 3 次全綠，再進比賽模式」。</li>
+    <li>下次上課看學生的「紀錄」頁：常錯小節和常偏的音，就是這週要指導的重點。</li>
+  </ol>
+  <h3>資料與備份</h3>
+  <p>樂譜和紀錄只存在這台電腦的瀏覽器裡，不會上傳到網路。換電腦前，到「設定」按 <span class="ui">複製備份文字</span>，貼到記事本保存；在新電腦按 <span class="ui">從備份還原</span> 貼回去。示範錄音檔案比較大，不在備份文字裡，換電腦後請重新上傳或重錄。</p>
+  <div class="warnbox">還原會用備份內容取代這台電腦上的紀錄。老師若要看學生的紀錄，請在另一個瀏覽器（例如 Edge）還原，不要蓋掉自己的資料。</div>
+</section>
+
+<section id="faq">
+  <h2>常見問題</h2>
+  <dl class="faq">
+    <dt>右上角音量條不會動</dt>
+    <dd>確認已按「開啟」並允許麥克風；到「設定」→「輸入裝置」選對夾式麥克風；確認無線麥克風有開電源。音量條變紅色代表太大聲，請把麥克風移遠一點。</dd>
+    <dt>我覺得拉對了，卻一直亮紅燈或黃燈</dt>
+    <dd>先檢查：琴有沒有用調音器調準？標準音 A 是否和老師一樣（440 或 442）？如果是節奏一直判「延遲」或「提前」，請重做延遲校正。</dd>
+    <dt>沒拉的時候也出現音名</dt>
+    <dd>環境太吵或耳機漏音。到「設定」重新「測量環境噪音」，並改用耳機聽節拍器。</dd>
+    <dt>樂譜沒有出現，只有文字「樂譜元件載入失敗」</dt>
+    <dd>電腦沒有連上網路。連上後重新整理頁面。</dd>
+    <dt>直笛吹出來顯示高了一個八度</dt>
+    <dd>高音直笛的實際聲音本來就比譜高一個八度，小幫手已自動換算。請確認樂曲資訊顯示的是「高音直笛」；如果樂譜被設成小提琴，請 Claude 把樂器改成高音直笛再匯入一次。</dd>
+    <dt>雙音是怎麼判斷的？</dt>
+    <dd>兩個音同時響時聲音會混在一起，單音偵測會聽錯（D＋A 的五度會被聽成更低的 D）。所以雙音改用頻譜分析：樂譜已經知道是哪兩個音，小幫手就到兩個音各自「不重疊的泛音」位置量出實際音高，再計算兩音的音程。比賽評審聽雙音，重點是音程是否純淨、有沒有「嗡嗡」的拍音，所以預設用<b>純律</b>判斷（五度 702 cents、大三度 386 cents）。報告會建議調哪一個音：有空弦時以空弦為準調另一個音，沒有空弦時以低音為準調高音。八度和同音因為泛音完全重疊，只能粗略判斷，最多亮黃燈。</dd>
+    <dt>上傳的錄音「對齊可信度」很低</dt>
+    <dd>確認錄音和樂譜是同一首、同一個版本、同一個調，而且是單一樂器。開頭和結尾有很長的空白或講話也會影響，請剪掉後再上傳。</dd>
+    <dt>小琴一直說話太吵</dt>
+    <dd>按上方的「語音開」改成「語音關」。也可以在「設定」把小琴藏起來。</dd>
+    <dt>拉同一個音重複好幾次時，節奏沒有判斷</dt>
+    <dd>同音反覆時要靠換弓的音量變化判斷起音。換弓太平順時偶爾抓不到，這時不扣節奏分數。</dd>
+    <dt>畫面上的按鍵快速操作</dt>
+    <dd><kbd>空白鍵</kbd> 開始或停止練習，<kbd>Esc</kbd> 停止。</dd>
+  </dl>
+</section>
+
+<section id="daily">
+  <h2>每日練琴卡</h2>
+  <p class="muted">小朋友可以照這張卡每天練。</p>
+  <div class="card">
+    <ul class="daily">
+      <li><span>夾好麥克風、戴耳機、按「開啟」<br><small>音量條會動</small></span></li>
+      <li><span>四條弦都調到綠色<br><small>調音頁，±3 cents</small></span></li>
+      <li><span>D 大調音階：進階模式全綠<br><small>熱身 5 分鐘</small></span></li>
+      <li><span>聽一次今天要練的曲子示範</span></li>
+      <li><span>按「小琴陪你加強」，把紅燈小節練到過關</span></li>
+      <li><span>比賽模式完整拉一次，記下分數：＿＿＿ 分</span></li>
+      <li><span>看「紀錄」頁，寫下今天最常錯的地方：＿＿＿＿＿＿</span></li>
+    </ul>
+  </div>
+</section>
+
+<footer>練琴小幫手使用說明書。練琴小幫手是課後在家練習的輔助工具，練習方式請以指導老師、指揮老師的指示為準。<br>© 悠樂媽媽 製作・僅供個人與教學非商業使用，請勿轉售、改作後販售或作為商業用途。</footer>
+</main>
+</div>
+
+</html>

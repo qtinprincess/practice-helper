@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>練琴小幫手</title>
+<meta name="description" content="比賽前在家練習的小幫手：檢查音準與節奏、記錄進步。悠樂媽媽 製作。">
+<meta name="author" content="悠樂媽媽">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;700&display=swap">
+<style>
+/* 版面概念：一張安靜的譜架。紙白的樂譜是主角，控制列像譜架下緣的一條細木條；
+   顏色只留給燈號與音準方向，其他全部是雲杉綠與石墨灰。 */
+:root{
+  --bg:#f3f4f2; --surface:#ffffff; --sunk:#eceeeb; --ink:#1c211f; --muted:#68716c; --line:#dde1de;
+  --accent:#2d5a4c; --accent-soft:#e3ece8; --on-accent:#ffffff; --rosin:#a8742c;
+  --ok:#2f9e5b; --warn:#d49a12; --bad:#cf4339; --sharp:#e0782a; --flat:#2f6fbf;
+  --paper:#fdfdfb; --paper-ink:#1c211f;
+  --display:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --r:10px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121614; --surface:#1a1f1d; --sunk:#151917; --ink:#e6ebe8; --muted:#95a19b; --line:#2b332f;
+  --accent:#86c4ad; --accent-soft:#20302a; --on-accent:#0f1513; --rosin:#d4a25c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121614; --surface:#1a1f1d; --sunk:#151917; --ink:#e6ebe8; --muted:#95a19b; --line:#2b332f;
+  --accent:#86c4ad; --accent-soft:#20302a; --on-accent:#0f1513; --rosin:#d4a25c; color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.65 var(--body);-webkit-font-smoothing:antialiased}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+[hidden]{display:none!important}
+.num{font-variant-numeric:tabular-nums}
+
+/* 頂列 */
+.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-in{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:20px;padding:10px max(16px,env(safe-area-inset-left,0px)) 10px max(16px,env(safe-area-inset-right,0px));flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:18px;font-weight:700;letter-spacing:.04em;white-space:nowrap}
+.brand i{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--accent);display:grid;place-items:center;font-style:normal;font-size:14px;color:var(--accent)}
+nav{display:flex;gap:2px;flex-wrap:wrap}
+nav button{border:0;background:none;padding:6px 12px;border-radius:999px;color:var(--muted);font-weight:500}
+nav .navlink{padding:6px 12px;border-radius:999px;color:var(--muted);font-weight:500;text-decoration:none}
+nav .navlink:hover{color:var(--ink)}
+nav button[aria-current="page"]{background:var(--surface);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.micpill{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 6px 4px 12px;background:var(--surface)}
+.micpill .lvl{width:64px;height:6px;border-radius:3px;background:var(--sunk);overflow:hidden}
+.micpill .lvl b{display:block;height:100%;width:0;background:var(--ok);transition:width .06s}
+.micpill button{border:0;background:var(--accent);color:var(--on-accent);border-radius:999px;padding:3px 10px;font-size:13px}
+.micpill.on button{background:var(--sunk);color:var(--ink)}
+
+main{max-width:1180px;margin:0 auto;padding:24px max(16px,env(safe-area-inset-right,0px)) 64px max(16px,env(safe-area-inset-left,0px))}
+h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;text-wrap:balance;letter-spacing:.02em}
+h1{font-size:clamp(24px,3.4vw,32px)}
+h2{font-size:20px}
+h3{font-size:16px}
+.eyebrow{font-size:12px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+.muted{color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+
+/* 按鈕 */
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 14px;display:inline-flex;align-items:center;gap:8px;font-weight:500;white-space:nowrap}
+.btn:hover{border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.danger{color:var(--bad)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn svg{width:14px;height:14px;fill:currentColor}
+.toggle{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--muted);cursor:pointer;user-select:none}
+.toggle input{accent-color:var(--accent);width:16px;height:16px}
+
+/* 練習頁 */
+.songhead{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.songhead .meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chip{font-size:13px;border:1px solid var(--line);border-radius:999px;padding:2px 10px;color:var(--muted);background:var(--surface)}
+.songhead select{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 10px;max-width:100%}
+
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface)}
+.modes button{border:0;background:none;padding:12px 14px;text-align:left;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:2px;min-width:0}
+.modes button:last-child{border-right:0}
+.modes b{font-family:var(--display);font-size:16px}
+.modes span{font-size:12.5px;color:var(--muted);line-height:1.5}
+.modes button[aria-pressed="true"]{background:var(--accent-soft);box-shadow:inset 0 -2px 0 var(--accent)}
+.modes button[aria-pressed="true"] b{color:var(--accent)}
+
+.bar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:14px 0 10px}
+.bar .grp{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tempo{display:flex;align-items:center;gap:10px;font-size:14px}
+.tempo input[type=range]{width:140px;accent-color:var(--accent)}
+.tempo output{min-width:118px}
+
+.rangebar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:14px;color:var(--muted);padding:10px 14px;border-radius:8px;background:var(--sunk)}
+.rangebar b{color:var(--ink)}
+.rangebar button{border:0;background:none;color:var(--accent);padding:0;font-weight:500}
+.rangebar button[aria-pressed="true"]{text-decoration:underline;text-underline-offset:4px}
+
+.live{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:14px 0 8px}
+.status{font-size:15px;min-height:1.6em;flex:1;min-width:220px}
+.status strong{font-family:var(--display);font-size:18px}
+.needle-mini{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.needle-mini .scale{position:relative;width:150px;height:8px;border-radius:4px;background:linear-gradient(90deg,var(--flat) 0 30%,var(--ok) 40% 60%,var(--sharp) 70% 100%);opacity:.35}
+.needle-mini .pin{position:absolute;top:-4px;width:3px;height:16px;border-radius:2px;background:var(--ink);left:50%;transition:left .08s}
+.needle-mini .note{font-family:var(--display);font-size:20px;color:var(--ink);min-width:48px;text-align:right}
+
+.score-wrap{position:relative;background:var(--paper);color:var(--paper-ink);border-radius:var(--r);border:1px solid var(--line);padding:14px 10px 6px;overflow:hidden}
+#score svg{display:block;max-width:none}
+#overlay{position:absolute;inset:14px 10px 6px;pointer-events:none}
+.mbox{position:absolute;pointer-events:auto;border-radius:6px;cursor:pointer;transition:background .2s}
+.mbox:hover{background:rgba(45,90,76,.05)}
+.mbox.sel{background:rgba(45,90,76,.09);box-shadow:inset 0 0 0 1.5px rgba(45,90,76,.55)}
+.mbox.playing{background:rgba(168,116,44,.10)}
+.mbox .no{position:absolute;left:6px;top:2px;font-size:11px;color:#7a837e}
+.mbox .lamp{position:absolute;right:8px;top:6px;width:12px;height:12px;border-radius:50%;background:#d6dad7;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.mbox.lv-g .lamp{background:var(--ok);box-shadow:0 0 0 3px rgba(47,158,91,.18)}
+.mbox.lv-y .lamp{background:var(--warn);box-shadow:0 0 0 3px rgba(212,154,18,.2)}
+.mbox.lv-r .lamp{background:var(--bad);box-shadow:0 0 0 3px rgba(207,67,57,.2)}
+.mbox.lv-r{background:rgba(207,67,57,.045)}
+.mark{position:absolute;transform:translateX(-50%);font-size:11px;font-weight:700;white-space:nowrap;pointer-events:none;font-variant-numeric:tabular-nums}
+.cursor{position:absolute;width:2px;background:var(--rosin);border-radius:1px;pointer-events:none;transition:left .06s linear;box-shadow:0 0 0 3px rgba(168,116,44,.15)}
+.score-empty{padding:40px 16px;text-align:center;color:#68716c}
+
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted);margin:10px 2px 0}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+
+/* 報告 */
+.report{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:18px;margin-top:22px}
+.report>div{padding:20px}
+.scorebig{display:flex;align-items:baseline;gap:8px}
+.scorebig b{font-family:var(--display);font-size:56px;line-height:1;color:var(--accent)}
+.lamps{display:flex;gap:14px;margin:12px 0 16px;font-size:14px}
+.lamps span{display:flex;align-items:center;gap:6px}
+.lamps i{width:10px;height:10px;border-radius:50%}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0}
+.coach{margin-top:18px;padding:14px;border-radius:8px;background:var(--accent-soft);font-size:14px}
+.coach h3{font-size:15px;margin-bottom:4px;color:var(--accent)}
+.coach .btn{margin-top:10px}
+.issues{list-style:none;margin:12px 0 0;padding:0;max-height:440px;overflow:auto}
+.issues li{display:grid;grid-template-columns:12px 1fr;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line);cursor:pointer}
+.issues li:hover{background:var(--sunk)}
+.issues .dot{width:10px;height:10px;border-radius:50%;margin-top:7px}
+.issues .w{font-size:13px;color:var(--muted)}
+.issues .t{font-weight:500}
+.issues .f{font-size:12.5px;color:var(--muted)}
+.empty-tips ol{padding-left:20px;margin:8px 0}
+.empty-tips li{margin:4px 0}
+
+/* 調音器 */
+.tuner{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;margin-top:18px}
+.tuner .face{padding:24px;text-align:center}
+.tuner svg{width:100%;max-width:460px;height:auto}
+.tnote{font-family:var(--display);font-size:64px;line-height:1;margin-top:-8px}
+.tsub{color:var(--muted);margin-top:6px}
+.strings{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:20px}
+.strings button{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:10px 0;display:flex;flex-direction:column;align-items:center}
+.strings button b{font-family:var(--display);font-size:22px}
+.strings button span{font-size:12px;color:var(--muted)}
+.strings button.on{border-color:var(--accent);background:var(--accent-soft)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:6px 12px;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.side{padding:20px;font-size:14px}
+.side ul{padding-left:18px;margin:8px 0}
+
+/* 曲庫 */
+.lib{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;margin-top:18px}
+.songs{display:grid;gap:10px}
+.song{padding:14px 16px;display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center}
+.song h3{font-size:16px}
+.song .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.song .info{font-size:13px;color:var(--muted)}
+.tag{font-size:11px;border-radius:4px;padding:1px 6px;background:var(--sunk);color:var(--muted);margin-left:6px;vertical-align:2px;font-family:var(--body);font-weight:500}
+textarea{width:100%;min-height:150px;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:10px;font:13px/1.5 ui-monospace,Consolas,monospace}
+.steps{counter-reset:s;list-style:none;padding:0;margin:10px 0}
+.steps li{counter-increment:s;padding-left:30px;position:relative;margin:8px 0;font-size:14px}
+.steps li::before{content:counter(s);position:absolute;left:0;top:1px;width:20px;height:20px;border-radius:50%;border:1px solid var(--accent);color:var(--accent);font-size:12px;display:grid;place-items:center}
+pre.code{background:var(--sunk);border-radius:8px;padding:12px;font:12.5px/1.6 ui-monospace,Consolas,monospace;overflow-x:auto;margin:8px 0}
+
+/* 紀錄 */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0}
+.kpi{padding:14px 16px}
+.kpi .v{font-family:var(--display);font-size:28px;line-height:1.2}
+.kpi .l{font-size:13px;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;margin-top:18px}
+.panel{padding:18px 20px;min-width:0}
+.panel h3{margin-bottom:10px}
+.chart svg{width:100%;height:auto;display:block}
+.blist{display:grid;gap:8px}
+.brow{display:grid;grid-template-columns:76px 1fr 64px;gap:10px;align-items:center;font-size:14px;cursor:default}
+.brow .track{height:8px;background:var(--sunk);border-radius:4px;position:relative;overflow:hidden}
+.brow .track b{position:absolute;top:0;bottom:0;border-radius:4px}
+.brow .track .mid{position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:var(--muted);opacity:.5}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+th{font-weight:500;color:var(--muted);font-size:13px}
+.tablewrap{overflow-x:auto}
+
+/* 設定 */
+.settings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:18px}
+.settings .panel p{font-size:14px;color:var(--muted);margin:6px 0 12px}
+.field{display:flex;align-items:center;gap:10px;margin:10px 0;flex-wrap:wrap;font-size:14px}
+.field select,.field input[type=number]{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:5px 8px}
+.field input[type=number]{width:72px}
+.tol td input{width:64px;border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:4px 6px}
+
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:all .25s;max-width:calc(100% - 32px);z-index:50}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.count{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none;z-index:40;font-family:var(--display);font-size:120px;color:var(--accent);opacity:0;transition:opacity .15s}
+.count.show{opacity:.9}
+
+/* 基本功、跟唱、作業、模擬上台、頁尾 */
+.b-items{display:grid;gap:8px}
+.b-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;flex-wrap:wrap}
+.b-item.pass{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 35%,var(--line))}
+.b-item .acts{display:flex;gap:6px}
+.basics-lv{margin-top:14px}
+.sing-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;margin-top:18px}
+.sing-list{display:grid;gap:6px;margin-top:10px}
+.sing-item{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:6px;font-size:14px}
+.sing-item.on{background:var(--accent-soft)}
+.sing-item .linkish{border:0;background:none;color:var(--accent);font-weight:500;padding:0;text-align:left;flex:1;min-width:0}
+.sing-canvas-wrap{margin-top:18px;padding:10px;overflow:hidden}
+.sing-canvas-wrap canvas{display:block;border-radius:8px}
+.sing-legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted);margin-top:8px}
+.sing-legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.sing-legend i.ref{width:18px;height:6px;border-radius:3px;background:rgba(28,33,31,.3)}
+.dyn-notes{margin-top:12px;font-size:14px;background:var(--sunk);border-radius:8px;padding:10px 14px}
+.dyn-notes ul{margin:4px 0 0;padding-left:18px}
+details.more{margin-top:8px;font-size:14px}
+details.more summary{cursor:pointer;color:var(--muted)}
+#v-library.dropping{outline:3px dashed var(--accent);outline-offset:6px;border-radius:12px}
+.stage{position:fixed;inset:0;z-index:60;background:rgba(15,20,18,.92);color:#fff;display:grid;place-items:center;text-align:center;padding:24px}
+.stage p{font-family:var(--display);font-size:clamp(24px,5vw,40px);margin:12px 0 24px;max-width:20ch}
+.stage .eyebrow{color:#cfd8d3}
+.site-foot{max-width:1180px;margin:0 auto;padding:18px max(16px,env(safe-area-inset-right,0px)) 90px max(16px,env(safe-area-inset-left,0px));font-size:12.5px;color:var(--muted);display:grid;gap:4px;border-top:1px solid var(--line)}
+@media (max-width:860px){.sing-grid{grid-template-columns:minmax(0,1fr)}}
+
+/* 點記號看說明、背譜、批註 */
+.viewbar{margin:4px 0 10px;gap:10px 16px}
+.mini-field{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--muted)}
+.mini-field select,select.mini{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:4px 6px;font-size:13px}
+.btn.sm{padding:3px 10px;font-size:13px}
+#btnExplain[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.hot{position:absolute;pointer-events:auto;border:0;background:rgba(168,116,44,.0);border-radius:6px;cursor:help;padding:0;z-index:2}
+.hot:hover,.hot:focus-visible{background:rgba(168,116,44,.16);outline:1.5px dashed rgba(168,116,44,.7)}
+.explain{position:absolute;z-index:5;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:14px 16px 12px;font-size:14px;line-height:1.7;max-width:calc(100% - 12px)}
+.explain h4{margin:0 22px 6px 0;font-family:var(--display);font-size:16px;color:var(--accent)}
+.explain .ex-x{position:absolute;right:8px;top:6px;border:0;background:none;font-size:20px;color:var(--muted);line-height:1}
+.explain .ex-acts{display:flex;gap:8px;margin-top:10px}
+.explain .ex-in{width:100%;border:1px solid var(--line);border-radius:6px;padding:6px 8px;margin:4px 0 8px;background:var(--surface)}
+.memo-mask{position:absolute;left:6px;right:6px;background:var(--paper);border-radius:6px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.05)}
+.memo-mask::after{content:"背譜中";position:absolute;inset:0;display:grid;place-items:center;color:#9aa39e;font-size:12px;letter-spacing:.2em}
+.lyr{position:absolute;transform:translateX(-50%);font-size:13px;color:#2b3330;white-space:nowrap;pointer-events:none;font-family:var(--body)}
+.annot{position:absolute;transform:translateX(-50%);font-size:11.5px;color:#8a5a12;background:#fff7e6;border:1px solid #ecd3a3;border-radius:6px;padding:0 6px;white-space:nowrap;pointer-events:none}
+
+/* 星星、語音、示範錄音面板 */
+.starpill{display:flex;align-items:center;gap:6px;font-size:13px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;background:var(--surface);color:var(--muted);white-space:nowrap}
+.starpill b{color:#b07a0a;font-variant-numeric:tabular-nums}
+.voicebtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;font-size:13px;color:var(--muted)}
+.voicebtn svg{width:14px;height:14px;fill:currentColor}
+.voicebtn[aria-pressed="true"]{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+.speak{display:inline-flex;align-items:center;gap:6px;border:1px solid color-mix(in srgb,var(--accent) 40%,var(--line));background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:6px 14px;font-weight:500}
+.speak svg{width:15px;height:15px;fill:currentColor}
+#ens{margin:12px 0 0;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+#ens summary{cursor:pointer;padding:10px 14px;font-size:14px;font-weight:500;list-style:none;display:flex;align-items:center;gap:8px}
+#ens summary::-webkit-details-marker{display:none}
+#ens summary::before{content:"";width:7px;height:7px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:rotate(-45deg);transition:transform .2s}
+#ens[open] summary::before{transform:rotate(45deg)}
+#ens summary .muted{font-weight:400}
+.ens-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;padding:4px 16px 16px}
+.ens-col h4{margin:4px 0 8px;font-size:14px;font-family:var(--display)}
+.ens-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 0;font-size:14px}
+.ens-row select,.ens-row input[type=url]{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:5px 8px;min-width:0;flex:1 1 180px}
+.ens-row input[type=range]{accent-color:var(--accent);width:120px}
+.ens-note{font-size:13px;color:var(--muted);margin:6px 0}
+label.btn{cursor:pointer}
+@media (max-width:860px){
+  .ens-body{grid-template-columns:minmax(0,1fr)}
+  .report,.tuner,.lib,.grid2,.settings{grid-template-columns:minmax(0,1fr)}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:560px){
+  .modes{grid-template-columns:minmax(0,1fr)}
+  .modes button{border-right:0;border-bottom:1px solid var(--line)}
+  .micpill{margin-left:0}
+  .tempo input[type=range]{width:110px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <div class="brand"><i>琴</i>練琴小幫手</div>
+  <nav aria-label="主選單">
+    <button data-view="practice" aria-current="page">練習</button>
+    <button data-view="basics">基本功</button>
+    <button data-view="sing">跟唱</button>
+    <button data-view="tuner">調音</button>
+    <button data-view="library">曲庫</button>
+    <button data-view="log">紀錄</button>
+    <button data-view="settings">設定</button>
+    <a class="navlink" href="guide.html" target="_blank" rel="noopener">說明書</a>
+  </nav>
+  <div class="starpill" id="starPill" title="綠燈會得到星星"></div>
+  <button class="voicebtn" id="voiceBtn" aria-pressed="true" title="語音小幫手：唸出提示與說明"><svg viewBox="0 0 16 16"><path d="M2 6h3l4-3v10L5 10H2z"/><path d="M11 5.5a3.5 3.5 0 0 1 0 5" stroke="currentColor" stroke-width="1.4" fill="none"/></svg><span>語音開</span></button>
+  <div class="micpill" id="micpill"><span id="micText">麥克風未開啟</span><span class="lvl"><b id="micLvl"></b></span><button id="micBtn">開啟</button></div>
+</div></header>
+
+<main>
+<!-- ============ 練習 ============ -->
+<section id="v-practice">
+  <div class="songhead">
+    <div>
+      <div class="eyebrow">正在練習</div>
+      <h1 id="songTitle">—</h1>
+      <div class="meta" id="songMeta"></div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="speak" data-guide="practice"><svg viewBox="0 0 16 16"><path d="M2 6h3l4-3v10L5 10H2z"/><path d="M11 5.5a3.5 3.5 0 0 1 0 5M12.5 3.5a6 6 0 0 1 0 9" stroke="currentColor" stroke-width="1.4" fill="none"/></svg>聽說明</button>
+    <label class="muted" style="font-size:14px">換一首
+      <select id="songSelect" aria-label="選擇樂曲"></select>
+    </label></div>
+  </div>
+
+  <div class="modes" id="modes">
+    <button data-mode="beginner" aria-pressed="false"><b>初學模式</b><span>等你拉對才往下，只看音準</span></button>
+    <button data-mode="advanced" aria-pressed="true"><b>進階模式</b><span>跟節拍器，音準＋節奏同步</span></button>
+    <button data-mode="contest" aria-pressed="false"><b>比賽模式</b><span>全曲連續、全國賽標準</span></button>
+  </div>
+
+  <div class="bar">
+    <div class="grp">
+      <button class="btn primary" id="btnStart"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/></svg>開始練習</button>
+      <button class="btn" id="btnDemo"><svg viewBox="0 0 16 16"><path d="M4 2.5v11l9-5.5z"/></svg>聆聽示範</button>
+      <button class="btn" id="btnStop" disabled><svg viewBox="0 0 16 16"><rect x="3" y="3" width="10" height="10" rx="1.5"/></svg>停止</button>
+      <button class="btn" id="btnHint" hidden>提示音</button>
+      <button class="btn" id="btnStage" hidden title="從上台、鞠躬、調音到一次拉完，模擬比賽的感覺">模擬上台</button>
+    </div>
+    <div class="tempo"><label for="speed">速度</label><input type="range" id="speed" min="40" max="120" step="5" value="100"><output id="speedOut" class="num"></output></div>
+    <div class="grp">
+      <label class="toggle"><input type="checkbox" id="optMetro" checked>節拍器</label>
+      <select id="metroMode" aria-label="節拍器打法" class="mini"><option value="all">每拍</option><option value="down">只打第一拍</option><option value="fade">漸隱（循環時越來越少）</option></select>
+      <label class="toggle" title="一直響著主音，用耳朵比對音準"><input type="checkbox" id="optDrone">持續主音</label>
+      <label class="toggle"><input type="checkbox" id="optGuide">伴奏旋律</label>
+      <label class="toggle"><input type="checkbox" id="optLoop">循環</label>
+    </div>
+  </div>
+
+  <div class="bar viewbar">
+    <button class="btn" id="btnExplain" aria-pressed="false" title="開啟後，點樂譜上的任何記號就會出現說明">點記號看說明</button>
+    <label class="mini-field">譜下文字 <select id="lyricMode"><option value="auto">自動</option><option value="lyric">歌詞</option><option value="movable">首調唱名</option><option value="fixed">固定唱名</option><option value="none">不顯示</option></select></label>
+    <label class="mini-field">移調 <button class="btn sm" id="shiftDown" aria-label="降半音">−</button><output id="shiftOut" class="num">0</output><button class="btn sm" id="shiftUp" aria-label="升半音">＋</button></label>
+    <label class="mini-field">背譜 <select id="memoSel"><option value="0">不遮</option><option value="1">遮一半</option><option value="2">只留每行第一小節</option><option value="3">全部遮住</option></select></label>
+  </div>
+
+  <div class="rangebar" id="rangebar">
+    <span>練習範圍：<b id="rangeLabel">全曲</b></span>
+    <button id="btnExtend" aria-pressed="false">延伸範圍</button>
+    <button id="btnAll">改回全曲</button>
+    <span id="rangeHint">點一下小節即可選取；按「延伸範圍」再點另一小節可選一段（電腦也可按住 Shift）。</span>
+  </div>
+
+  <details id="ens" open>
+    <summary>示範錄音・樂團伴奏 <span class="muted">（老師錄音、mp3、其他聲部）</span></summary>
+    <div class="ens-body"></div>
+  </details>
+
+  <div class="live">
+    <div class="status" id="status">按「開始練習」，先聽一小節預備拍再進來。</div>
+    <div class="needle-mini" title="目前聽到的音"><span class="note" id="liveNote">—</span><div class="scale"><div class="pin" id="livePin"></div></div><span id="liveCents" class="num">　</span></div>
+  </div>
+
+  <div class="score-wrap"><div id="score"><div class="score-empty">樂譜載入中…</div></div><div id="overlay"></div>
+    <div class="explain" id="explainBox" hidden role="dialog" aria-label="記號說明"><button class="ex-x" id="exClose" aria-label="關閉">×</button><h4></h4><div class="ex-body"></div>
+      <div class="ex-acts"><button class="btn sm ex-play">聽聽看</button><button class="btn sm ex-annot">老師批註</button></div></div>
+  </div>
+  <div class="legend">
+    <span><i style="background:var(--ok)"></i>正確</span>
+    <span><i style="background:var(--sharp)"></i>偏高</span>
+    <span><i style="background:var(--flat)"></i>偏低</span>
+    <span><i style="background:var(--bad)"></i>錯音・漏音</span>
+    <span>音符下方 <b>←</b> 提前・<b>→</b> 延遲・<b>⌐</b> 太短</span>
+    <span>右上燈號：綠 完全正確・黃 稍微不準・紅 需要重拉</span>
+  </div>
+
+  <div class="report" id="report"></div>
+</section>
+
+<!-- ============ 基本功 ============ -->
+<section id="v-basics" hidden></section>
+
+<!-- ============ 跟唱 ============ -->
+<section id="v-sing" hidden></section>
+
+<!-- ============ 調音 ============ -->
+<section id="v-tuner" hidden>
+  <div class="songhead">
+    <div><div class="eyebrow">調音器</div><h1>先把弦調準</h1></div>
+    <button class="speak" data-guide="tuner"><svg viewBox="0 0 16 16"><path d="M2 6h3l4-3v10L5 10H2z"/><path d="M11 5.5a3.5 3.5 0 0 1 0 5M12.5 3.5a6 6 0 0 1 0 9" stroke="currentColor" stroke-width="1.4" fill="none"/></svg>聽說明</button>
+    <div class="seg" id="tunerMode">
+      <button data-tm="violin" aria-pressed="true">小提琴四弦</button>
+      <button data-tm="chromatic" aria-pressed="false">半音階（直笛）</button>
+      <button data-tm="pipe" aria-pressed="false">合唱起音器</button>
+    </div>
+  </div>
+  <div class="tuner">
+    <div class="card face">
+      <svg viewBox="0 0 400 230" aria-hidden="true">
+        <g id="tTicks"></g>
+        <line id="tNeedle" x1="200" y1="210" x2="200" y2="50" stroke="var(--ink)" stroke-width="3" stroke-linecap="round" style="transform-origin:200px 210px;transition:transform .1s"/>
+        <circle cx="200" cy="210" r="7" fill="var(--ink)"/>
+      </svg>
+      <div class="tnote" id="tNote">—</div>
+      <div class="tsub num" id="tSub">開啟麥克風後拉一條空弦，或唱一個長音</div>
+      <div class="strings" id="tStrings"></div>
+    </div>
+    <div class="card side">
+      <h3>調音小叮嚀</h3>
+      <ul>
+        <li>指針在中間、顯示綠色（±3 cents 內）才算調準。比賽前建議每條弦都調到綠色。</li>
+        <li>先調 A 弦，再調 D、G、E。用微調器小幅轉動，大幅偏差才轉弦軸。</li>
+        <li>點下方弦名可以播放標準音，用耳朵比對。</li>
+        <li>直笛無法調弦：吹嘴往外拔一點音會變低、推緊會變高；吹太用力也會偏高。</li>
+        <li>合唱：選「合唱起音器」，按「主和弦」聽調性，再按自己聲部的起音，唱出來看指針準不準。</li>
+      </ul>
+      <div class="field"><label for="tA">標準音 A =</label><select id="tA"></select><span class="muted">Hz（和設定同步）</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 曲庫 ============ -->
+<section id="v-library" hidden>
+  <div class="songhead"><div><div class="eyebrow">曲庫</div><h1>我的樂譜</h1></div><button class="speak" data-guide="library"><svg viewBox="0 0 16 16"><path d="M2 6h3l4-3v10L5 10H2z"/><path d="M11 5.5a3.5 3.5 0 0 1 0 5M12.5 3.5a6 6 0 0 1 0 9" stroke="currentColor" stroke-width="1.4" fill="none"/></svg>聽說明</button></div>
+  <div class="lib">
+    <div class="songs" id="songList"></div>
+    <div class="card panel">
+      <h3>加入新樂譜</h3>
+      <ol class="steps">
+        <li><b>紙本或照片：</b>把樂譜拍照（或 PDF）上傳給 Claude，說「幫我轉成練琴小幫手格式」，把拿到的文字貼到下面。</li>
+        <li><b>MusicXML 檔（最快、最準）：</b>MuseScore.com（公版曲免費，有版權的曲子需購買授權）、IMSLP 部分樂譜附的 MusicXML、OpenScore 公版樂譜，下載後直接選檔或拖曳進來。</li>
+        <li><b>只有 PDF：</b>用免費的 MuseScore 4「匯入 PDF」或 Audiveris 轉成 MusicXML，再匯入。轉換常有小錯，匯入後請對照原譜。</li>
+        <li>加入後到「練習」頁確認音符和原譜一致，再開始練。</li>
+      </ol>
+      <div class="field"><input type="file" id="fileIn" accept=".json,.txt,.xml,.musicxml,.mxl" multiple></div>
+      <p class="ens-note">也可以把好幾個 MusicXML 檔一次<b>拖曳</b>到這一頁。</p>
+      <div class="field"><input type="url" id="urlIn" placeholder="或貼上 MusicXML 檔的網址（例如 GitHub 上的 OpenScore）" style="flex:1;min-width:0;border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:var(--surface)"><button class="btn" id="btnUrl">從網址匯入</button></div>
+      <label for="pasteIn" class="muted" style="font-size:14px">或貼上練琴小幫手格式文字：</label>
+      <textarea id="pasteIn" spellcheck="false" placeholder='{"title":"小星星","tempo":80,"time":"4/4","key":"D","measures":["D4 D4 A4 A4","B4 B4 A4:h"]}'></textarea>
+      <div class="field"><button class="btn primary" id="btnPaste">加入曲庫</button><span class="muted" id="pasteMsg"></span></div>
+      <details>
+        <summary style="cursor:pointer;font-size:14px">練琴小幫手格式說明</summary>
+        <pre class="code">{
+  "title": "曲名", "composer": "作曲者",
+  "instrument": "violin",   // violin 小提琴、recorder-s 高音直笛、recorder-a 中音直笛
+  "tempo": 80,              // 每分鐘幾個四分音符
+  "time": "3/4",            // 拍號
+  "key": "G",               // 調號：C G D A E Bb Eb…，小調加 m，如 "Em"
+  "measures": [ "D4:q G4:8 A4 B4:q", "C5:h. ~", "C5:q R:q D5" ]
+}</pre>
+        <p class="muted" style="font-size:13px">音名＋八度（C4 是中央 C），寫實際要演奏的音：F#5、Bb4、Cn5（還原）。冒號後是時值：w 全、h 二分、q 四分、8、16、32；加 <b>.</b> 是附點、<b>t</b> 是三連音、<b>~</b> 接連結線。R 是休止符。同一小節內省略時值會沿用前一個，每小節開頭預設四分音符。</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 紀錄 ============ -->
+<section id="v-log" hidden>
+  <div class="songhead">
+    <div><div class="eyebrow">練習紀錄</div><h1 id="logTitle">我的進步</h1></div>
+    <label class="muted" style="font-size:14px">樂曲 <select id="logSong"></select></label>
+  </div>
+  <div class="field"><button class="btn" id="btnWeek">下載一週練習報告（給老師）</button></div>
+  <div id="logBody"></div>
+</section>
+
+<!-- ============ 設定 ============ -->
+<section id="v-settings" hidden>
+  <div class="songhead"><div><div class="eyebrow">設定</div><h1>麥克風與評分標準</h1></div></div>
+  <div class="settings">
+    <div class="card panel">
+      <h3>麥克風</h3>
+      <p>建議使用夾式麥克風，夾在琴身旁（小提琴）或衣領（直笛），距離音源 15–30 公分。系統已關閉降噪與自動音量，保留原始音色。</p>
+      <div class="field"><label for="devSel">輸入裝置</label><select id="devSel"><option value="">系統預設</option></select></div>
+      <div class="field"><button class="btn" id="btnGate">測量環境噪音（安靜 2 秒）</button><span class="muted num" id="gateOut"></span></div>
+    </div>
+    <div class="card panel">
+      <h3>延遲校正</h3>
+      <p>藍牙耳機、外接音效卡都會讓聲音晚一點到。校正後節奏判斷才準：按下後會先響 2 聲預備，接著 8 聲，請跟著拍手或用弓拉短音。</p>
+      <div class="field"><button class="btn" id="btnCal">開始校正</button><span class="muted num" id="calOut"></span></div>
+      <p style="margin-top:4px">戴耳機練習效果最好：節拍器和示範旋律不會被麥克風收進去。</p>
+    </div>
+    <div class="card panel">
+      <h3>音準基準</h3>
+      <div class="field"><label for="setA">標準音 A =</label><select id="setA"></select><span class="muted">Hz</span></div>
+      <p>台灣學生音樂比賽多與鋼琴伴奏合奏，常見 440 或 442 Hz；請依比賽伴奏鋼琴或老師指示設定。</p>
+      <div class="field"><label for="setDs">雙音音程標準</label><select id="setDs"><option value="just">純律（建議，比賽標準）</option><option value="equal">平均律（和鋼琴一樣）</option></select></div>
+      <p>純律五度、八度沒有拍音，最好聽；純律大三度比鋼琴窄約 14 cents。</p>
+      <div class="field"><label for="setTheme">外觀</label><select id="setTheme"><option value="">跟隨系統</option><option value="light">淺色</option><option value="dark">深色</option></select></div>
+    </div>
+    <div class="card panel">
+      <h3>容許誤差</h3>
+      <p>綠燈＝在綠色範圍內；黃燈＝超出綠色但在黃色範圍內；超過黃色範圍就是紅燈。</p>
+      <div class="tablewrap"><table class="tol" id="tolTable"></table></div>
+      <div class="field"><button class="btn" id="btnTolReset">恢復預設值</button></div>
+    </div>
+    <div class="card panel">
+      <h3>評分校正（給老師）</h3>
+      <p>老師可以在練習報告按「老師覆核燈號」，依自己的聽感修正小節燈號。累積 10 個以上，小幫手會算出最符合老師標準的容許度。</p>
+      <div id="calibBox"></div>
+    </div>
+    <div class="card panel">
+      <h3>音準基準與比賽</h3>
+      <div class="field"><label for="setInton">旋律音準</label><select id="setInton"><option value="equal">平均律（和鋼琴一樣）</option><option value="expressive">表情音準（導音可以略高）</option></select></div>
+      <p>表情音準：導音（例如 D 大調的 C♯）往主音靠近、略高 12 cents 以內不扣分，比較接近弦樂老師的要求。請依老師的指導選擇。</p>
+      <div class="field"><label for="setRecSys">直笛指法</label><select id="setRecSys"><option value="german">德式（學校常用）</option><option value="baroque">英式（巴洛克式）</option></select></div>
+      <div class="field"><label for="setStageLimit">模擬上台時間限制</label><input type="number" id="setStageLimit" min="0" max="30" placeholder="不限"> 分鐘</div>
+      <div class="field"><label class="toggle"><input type="checkbox" id="setStageMemo">模擬上台時遮住樂譜（背譜）</label></div>
+      <div class="field"><label for="setBreak">連續練習多久提醒休息</label><input type="number" id="setBreak" min="5" max="60"> 分鐘</div>
+    </div>
+    <div class="card panel">
+      <h3>小琴與語音</h3>
+      <p>給幼兒園、低年級的小朋友：小琴會用聲音唸出要拉的音、說明結果，也會鼓勵或幽默提醒。</p>
+      <div class="field"><label class="toggle"><input type="checkbox" id="setVoice">語音小幫手（唸出提示）</label></div>
+      <div class="field"><label class="toggle"><input type="checkbox" id="setMascot">顯示小琴角色與動畫</label></div>
+      <p id="voiceNote"></p>
+    </div>
+    <div class="card panel">
+      <h3>音量</h3>
+      <div class="field"><label for="volDemo">示範旋律</label><input type="range" id="volDemo" min="0" max="1" step="0.05"></div>
+      <div class="field"><label for="volClick">節拍器</label><input type="range" id="volClick" min="0" max="1" step="0.05"></div>
+    </div>
+    <div class="card panel">
+      <h3>資料</h3>
+      <p>樂譜與練習紀錄只存在這台電腦的瀏覽器裡。換電腦或清除瀏覽器資料前，請先備份。</p>
+      <div class="field"><button class="btn" id="btnBackup">複製備份文字</button><button class="btn" id="btnRestore">從備份還原</button></div>
+      <textarea id="backupBox" hidden spellcheck="false" placeholder="把備份文字貼在這裡，再按一次「從備份還原」"></textarea>
+      <div class="field"><button class="btn danger" id="btnWipe">清除所有練習紀錄</button></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site-foot"><div>練琴小幫手是課後在家練習的輔助工具，只幫忙檢查音準與節奏的對錯、記錄進步；指法、弓法、音樂詮釋與練習方式，請以指導老師、指揮老師的指示為準。</div>
+<div>© 悠樂媽媽 製作・僅供個人與教學非商業使用，請勿轉售或作為商業用途。</div></footer>
+
+<div class="stage" id="stage" hidden><div><div class="eyebrow">模擬上台</div><p></p><button class="btn" id="stageCancel">取消</button></div></div>
+<div class="toast" id="toast" role="status"></div>
+<div class="count" id="count"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.2/build/cjs/vexflow.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/songs.js"></script>
+<script src="js/explain.js"></script>
+<script src="js/basics.js"></script>
+<script src="js/sing.js"></script>
+<script src="js/fun.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
