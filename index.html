@@ -225,6 +225,9 @@ th{font-weight:500;color:var(--muted);font-size:13px}
 .sing-item.on{background:var(--accent-soft)}
 .sing-item .linkish{border:0;background:none;color:var(--accent);font-weight:500;padding:0;text-align:left;flex:1;min-width:0}
 .sing-canvas-wrap{margin-top:18px;padding:10px;overflow:hidden}
+.yt-box{margin:10px 0;border-radius:10px;overflow:hidden;background:var(--sunk);aspect-ratio:16/9;max-width:100%;display:grid;place-items:center}
+.yt-box iframe{width:100%;height:100%;border:0;display:block}
+.yt-box p{padding:16px;text-align:center}
 .sing-canvas-wrap canvas{display:block;border-radius:8px}
 .sing-legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted);margin-top:8px}
 .sing-legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
@@ -440,9 +443,9 @@ label.btn{cursor:pointer}
     <div class="card panel">
       <h3>加入新樂譜</h3>
       <ol class="steps">
-        <li><b>紙本或照片：</b>把樂譜拍照（或 PDF）上傳給 Claude，說「幫我轉成練琴小幫手格式」，把拿到的文字貼到下面。</li>
-        <li><b>MusicXML 檔（最快、最準）：</b>MuseScore.com（公版曲免費，有版權的曲子需購買授權）、IMSLP 部分樂譜附的 MusicXML、OpenScore 公版樂譜，下載後直接選檔或拖曳進來。</li>
-        <li><b>只有 PDF：</b>用免費的 MuseScore 4「匯入 PDF」或 Audiveris 轉成 MusicXML，再匯入。轉換常有小錯，匯入後請對照原譜。</li>
+        <li><b>紙本或照片：</b>把樂譜拍照（或 PDF）上傳給 <a href="https://claude.ai" target="_blank" rel="noopener">Claude</a>，說「幫我轉成練琴小幫手格式」，把拿到的文字貼到下面。</li>
+        <li><b>MusicXML 檔（最快、最準）：</b><a href="https://musescore.com/sheetmusic" target="_blank" rel="noopener">MuseScore.com</a>（公版曲免費，有版權的曲子需購買授權）、<a href="https://imslp.org" target="_blank" rel="noopener">IMSLP</a> 部分樂譜附的 MusicXML、<a href="https://musescore.com/openscore" target="_blank" rel="noopener">OpenScore</a> 公版樂譜、合唱曲可找 <a href="https://www.cpdl.org" target="_blank" rel="noopener">CPDL 合唱公版樂譜庫</a>，下載後直接選檔或拖曳進來。</li>
+        <li><b>只有 PDF：</b>用免費的 <a href="https://musescore.org/zh-hant/download" target="_blank" rel="noopener">MuseScore 4</a>「匯入 PDF」或 <a href="https://github.com/Audiveris/audiveris/releases" target="_blank" rel="noopener">Audiveris</a> 轉成 MusicXML，再匯入。轉換常有小錯，匯入後請對照原譜。</li>
         <li>加入後到「練習」頁確認音符和原譜一致，再開始練。</li>
       </ol>
       <div class="field"><input type="file" id="fileIn" accept=".json,.txt,.xml,.musicxml,.mxl" multiple></div>

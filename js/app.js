@@ -1219,8 +1219,9 @@ function renderEnsemble() {
     <div class="ens-col">
       <h4>樂團聲部與伴奏</h4>${partsHtml}
       <h4 style="margin-top:14px">YouTube 參考</h4>
-      <div class="ens-row"><input type="url" id="ytIn" placeholder="貼上 YouTube 網址" value="${esc(yt)}"><button class="btn" id="btnYt">儲存</button>${yt ? `<a class="btn" href="${esc(yt)}" target="_blank" rel="noopener">開啟</a>` : ''}</div>
-      <p class="ens-note">YouTube 只能點開聆聽，無法分析或評分（YouTube 不提供音訊下載）。要對照評分，請上傳錄音檔。</p>
+      <div class="ens-row"><input type="url" id="ytIn" placeholder="貼上 YouTube 網址" value="${esc(yt)}"><button class="btn" id="btnYt">儲存</button>${yt ? `<button class="btn" id="btnYtPlay">在頁面播放</button><a class="btn" href="${esc(yt)}" target="_blank" rel="noopener">到 YouTube 開啟</a>` : ''}</div>
+      <div id="ytEmbed"></div>
+      <p class="ens-note">YouTube 可以在這裡播放給你聽，但無法分析或評分（YouTube 不提供音訊下載）。要對照評分，請上傳錄音檔或匯入樂譜。</p>
     </div>`;
   const on = (id, ev, fn) => { const el = $(id); if (el) el.addEventListener(ev, fn); };
   on('#partSel', 'change', e => { settings.partSel = settings.partSel || {}; settings.partSel[song.id] = +e.target.value; saveSettings(); loadSong(song.id); });
@@ -1236,6 +1237,14 @@ function renderEnsemble() {
   on('#demoSrc', 'change', e => { settings.demoSrc = e.target.value; saveSettings(); });
   on('#optRefTiming', 'change', e => { settings.refTiming = e.target.checked; saveSettings(); });
   on('#optRefPlay', 'change', e => { settings.refPlay = e.target.checked; saveSettings(); });
+  on('#btnYtPlay', 'click', () => {
+    const m = String(yt).match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+    const box = $('#ytEmbed');
+    if (box.innerHTML) { box.innerHTML = ''; $('#btnYtPlay').textContent = '在頁面播放'; return; }
+    if (!m) { toast('看不懂這個 YouTube 網址'); return; }
+    box.innerHTML = `<div class="yt-box"><iframe src="https://www.youtube-nocookie.com/embed/${m[1]}?rel=0" title="YouTube 參考" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`;
+    $('#btnYtPlay').textContent = '關閉影片';
+  });
   on('#btnYt', 'click', () => {
     const v = $('#ytIn').value.trim();
     if (v && !/^https:\/\/(www\.|m\.)?(youtube\.com|youtu\.be)\//i.test(v)) { toast('請貼 YouTube 的網址（https://www.youtube.com/… 或 https://youtu.be/…）'); return; }
@@ -2122,7 +2131,7 @@ liveLoop();
 if (location.protocol === 'file:' && !navigator.mediaDevices) toast('請用 Chrome 或 Edge 開啟這個檔案', 5000);
 
 window.__lr = { st, AU, settings, setRef, loadSong, refUsable };
-window.LR = { st, AU, settings, store, IDB, E, FUN, ac, openMic, latency, click, toast, save: saveSettings };
+window.LR = { st, AU, settings, store, IDB, E, FUN, ac, openMic, latency, click, toast, save: saveSettings, importFile };
 if (window.SING) window.SING.init(window.LR);
 
 /* 自我測試：在主控台輸入 selfTest() 會合成一段有錯的演奏並跑完整評分 */

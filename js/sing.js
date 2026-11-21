@@ -63,6 +63,26 @@ S.render = function () {
       <p class="ens-note">戴耳機唱，麥克風只收你的聲音。綠點＝準（±25 cents）、黃點＝差一點、紅點＝偏離較多。</p>
     </div>
   </div>
+  <div class="card panel" style="margin-top:18px">
+    <h3>3. 用 YouTube 歌曲或合唱樂譜</h3>
+    <div class="sing-grid" style="margin-top:6px">
+      <div>
+        <div class="field"><input type="url" id="ytUrl" placeholder="貼上 YouTube 歌曲網址" style="flex:1;min-width:0;border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:var(--surface)" value="${esc(st.yt ? st.yt.url : '')}"><button class="btn" id="ytLoad">播放</button></div>
+        ${ytList().length ? `<div class="sing-list">${ytList().map((x, i) => `<div class="sing-item ${st.yt && st.yt.id === x.id ? 'on' : ''}"><button class="linkish" data-yt="${i}">${esc(x.name || x.url)}</button><a class="btn sm" href="${esc(x.url)}" target="_blank" rel="noopener">在 YouTube 開啟</a><button class="btn sm danger" data-ytdel="${i}">刪除</button></div>`).join('')}</div>` : ''}
+        <div class="yt-box" id="ytBox">${st.yt ? `<iframe src="https://www.youtube-nocookie.com/embed/${esc(st.yt.id)}?rel=0" title="YouTube 歌曲" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe>` : '<p class="muted">貼上網址按「播放」，歌曲會出現在這裡。</p>'}</div>
+        <div class="field"><button class="btn primary" id="monGo">開始聽我唱</button><button class="btn" id="monStop" disabled>停止</button></div>
+        <p class="ens-note">先按影片播放，再按「開始聽我唱」，下面的曲線會即時畫出你唱的音高。YouTube 的聲音無法分析，所以這裡<b>不會比對對錯</b>，只告訴你音唱得準不準（以標準音 A=${L.settings.A} 為準）、穩不穩。</p>
+      </div>
+      <div>
+        <p style="margin-top:0"><b>想要逐音評分？匯入這首歌的合唱樂譜</b></p>
+        <div class="field"><label class="btn" for="choirFile">匯入合唱樂譜（MusicXML）</label><input type="file" id="choirFile" accept=".xml,.musicxml,.mxl,.json,.txt" hidden></div>
+        <p class="ens-note">匯入後會自動打開練習頁，在「我的聲部」選女高、女低、男高或男低，其他聲部當伴奏，每一個音都會評分。</p>
+        <p class="ens-note">哪裡找合唱樂譜：<a href="https://www.cpdl.org" target="_blank" rel="noopener">CPDL 合唱公版樂譜庫</a>、<a href="https://musescore.com/sheetmusic" target="_blank" rel="noopener">MuseScore.com</a>（有版權的歌曲需購買授權）。只有紙本的話，可以拍照請 <a href="https://claude.ai" target="_blank" rel="noopener">Claude</a> 轉檔（請用自己擁有或公版的樂譜）。</p>
+        <p class="ens-note">想要逐句評分但沒有樂譜：請老師清唱一次，用上面的「1. 選標準錄音」錄起來。</p>
+      </div>
+    </div>
+    <div id="monReport"></div>
+  </div>
   <div class="card sing-canvas-wrap"><canvas id="singCanvas" height="260"></canvas><div class="sing-legend"><span><i class="ref"></i>標準</span><span><i style="background:var(--ok)"></i>你（準）</span><span><i style="background:var(--warn)"></i>差一點</span><span><i style="background:var(--bad)"></i>偏離</span><span class="num" id="singClock"></span></div></div>
   <div id="singReport"></div>`;
   const on = (id, ev, fn) => { const el = $(id); if (el) el.addEventListener(ev, fn); };
@@ -80,6 +100,18 @@ S.render = function () {
   on('#singStop', 'click', stopRun);
   on('#singOct', 'change', e => { L.settings.singOct = e.target.checked; L.save(); });
   on('#singVol', 'input', e => { L.settings.singVol = +e.target.value; L.save(); });
+  on('#ytLoad', 'click', () => {
+    const url = $('#ytUrl').value.trim(), id = ytIdOf(url);
+    if (!id) { $('#ytBox').innerHTML = '<p class="muted">看不懂這個網址，請貼 YouTube 影片的網址（youtube.com/watch?v=… 或 youtu.be/…）。</p>'; return; }
+    const list = ytList(); if (!list.some(x => x.id === id)) { list.unshift({ id, url, name: '' }); L.store.set('lr.singYt', list.slice(0, 30)); }
+    st.yt = { id, url }; S.render();
+  });
+  document.querySelectorAll('[data-yt]').forEach(b => b.addEventListener('click', () => { const x = ytList()[+b.dataset.yt]; st.yt = { id: x.id, url: x.url }; S.render(); }));
+  document.querySelectorAll('[data-ytdel]').forEach(b => b.addEventListener('click', () => { const l = ytList(); const x = l.splice(+b.dataset.ytdel, 1)[0]; L.store.set('lr.singYt', l); if (st.yt && x && st.yt.id === x.id) st.yt = null; S.render(); }));
+  on('#monGo', 'click', startMonitor);
+  on('#monStop', 'click', stopMonitor);
+  on('#choirFile', 'change', async e => { const f = e.target.files[0]; e.target.value = ''; if (f && L.importFile) await L.importFile(f); });
+  if (st.monLast) monReport(st.monLast);
   sizeCanvas(); draw(0);
   if (st.last) report(st.last);
 };
@@ -161,8 +193,93 @@ async function start(withMic) {
   };
   tick();
 }
+/* ---------- YouTube：只播放給孩子聽，同時即時顯示孩子的音高 ---------- */
+function ytList() { return L.store.get('lr.singYt', []); }
+function ytIdOf(u) {
+  const m = String(u).match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+async function startMonitor() {
+  const ctx = await L.ac(); if (!await L.openMic()) return;
+  stopRun();
+  const me = [], t0 = ctx.currentTime;
+  const listener = fr => { me.push({ t: fr.t - t0, m: E.isVoiced(fr, L.settings.gate) && fr.c > 0.85 ? E.midiFloat(fr.f, L.settings.A) : null }); };
+  L.AU.listeners.add(listener);
+  st.run = { kind: 'mon', t0, me, listener };
+  $('#monGo').disabled = true; $('#monStop').disabled = false;
+  L.FUN.event('start');
+  const tick = () => {
+    const R = st.run; if (!R || R.kind !== 'mon') return;
+    const now = ctx.currentTime - R.t0;
+    drawMon(now, R.me);
+    $('#singClock').textContent = '聽你唱 ' + fmt(now);
+    if (now > 600) { stopMonitor(); return; }
+    R.raf = requestAnimationFrame(tick);
+  };
+  tick();
+}
+function stopMonitor() {
+  const R = st.run; if (!R || R.kind !== 'mon') return;
+  cancelAnimationFrame(R.raf); L.AU.listeners.delete(R.listener); st.run = null;
+  $('#monGo').disabled = false; $('#monStop').disabled = true;
+  // 長音（同一個半音持續 0.3 秒以上）才算數，看準不準、穩不穩
+  const segs = []; let cur = null;
+  R.me.forEach(p => {
+    const k = p.m == null ? null : Math.round(p.m);
+    if (k != null && cur && cur.k === k) cur.v.push(p.m);
+    else { if (cur && cur.v.length >= 28) segs.push(cur); cur = k == null ? null : { k, v: [p.m] }; }
+  });
+  if (cur && cur.v.length >= 28) segs.push(cur);
+  if (!segs.length) { $('#monReport').innerHTML = '<p class="muted">沒有聽到夠長的音，靠近麥克風、唱大聲一點再試一次。</p>'; return; }
+  const devs = segs.map(sg => (E.median(sg.v.slice(Math.floor(sg.v.length * 0.2))) - sg.k) * 100);
+  const sds = segs.map(sg => E.std(sg.v.slice(Math.floor(sg.v.length * 0.2)).map(x => x * 100)));
+  const res = {
+    n: segs.length, inTune: Math.round(devs.filter(d => Math.abs(d) <= 25).length / devs.length * 100),
+    bias: Math.round(E.mean(devs)), shaky: Math.round(sds.filter(x => x > 30).length / sds.length * 100),
+    lo: E.midiName(Math.min(...segs.map(x => x.k))), hi: E.midiName(Math.max(...segs.map(x => x.k))),
+    drift: segs.length >= 6 ? Math.round(E.mean(devs.slice(-3)) - E.mean(devs.slice(0, 3))) : null
+  };
+  st.monLast = res; monReport(res);
+}
+function monReport(r) {
+  const tips = [];
+  if (r.bias < -15) tips.push(`長音整體偏低約 ${-r.bias} cents：吸飽氣，想著往上唱。`);
+  if (r.bias > 15) tips.push(`長音整體偏高約 ${r.bias} cents：放鬆喉嚨，不要擠。`);
+  if (r.shaky > 30) tips.push('不少長音在搖晃，用氣息把聲音穩住。');
+  if (r.inTune < 80) tips.push('有 ' + (100 - r.inTune) + '% 的長音沒有唱在準的音高上，可以先到「調音」用合唱起音器聽一下音，再唱一次。');
+  if (r.drift != null && r.drift < -20) tips.push('後面比前面低，長句子要留氣、句尾撐住。');
+  if (!tips.length) tips.push('長音唱得很準又很穩！');
+  $('#monReport').innerHTML = `<div class="coach" style="margin-top:12px"><h3>聽你唱的結果（僅供參考）</h3>
+    ${r.n} 個長音中，${r.inTune}% 唱在準的音高上（±25 cents）；音域 ${r.lo}–${r.hi}。<br>${tips.join('<br>')}
+    <br><span class="muted">這裡沒有和歌曲比對，旋律唱得對不對、咬字和表情，請照指揮老師的要求。</span></div>`;
+}
+function drawMon(now, me) {
+  const c = $('#singCanvas'); if (!c) return;
+  const ctx = c.getContext('2d'), dpr = devicePixelRatio || 1, W = c.width / dpr, H = c.height / dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const cs = getComputedStyle(document.documentElement), col = n => cs.getPropertyValue(n).trim() || '#888';
+  ctx.fillStyle = col('--paper'); ctx.fillRect(0, 0, W, H);
+  const vs = me.filter(p => p.m != null).slice(-600).map(p => p.m);
+  const mid = vs.length ? E.median(vs) : 64, lo = Math.floor(mid - 9), hi = Math.ceil(mid + 9);
+  const span = 8, x0 = now - span * 0.85, X = t => (t - x0) / span * W, Y = m => H - 14 - (m - lo) / (hi - lo) * (H - 28);
+  for (let m = lo; m <= hi; m++) {
+    ctx.strokeStyle = m % 12 === 0 ? 'rgba(45,90,76,.25)' : 'rgba(0,0,0,.06)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, Y(m)); ctx.lineTo(W, Y(m)); ctx.stroke();
+    ctx.fillStyle = '#8a938e'; ctx.font = '11px sans-serif'; ctx.fillText(E.midiName(m), 4, Y(m) - 2);
+  }
+  me.forEach(p => {
+    if (p.m == null || p.t < x0) return;
+    const d = Math.abs(p.m - Math.round(p.m)) * 100;
+    ctx.fillStyle = d <= 15 ? col('--ok') : d <= 30 ? col('--warn') : col('--bad');
+    ctx.beginPath(); ctx.arc(X(p.t), Y(Math.max(lo, Math.min(hi, p.m))), 2.6, 0, Math.PI * 2); ctx.fill();
+  });
+  const last = me.slice(-6).filter(p => p.m != null).pop();
+  if (last) { const k = Math.round(last.m), d = Math.round((last.m - k) * 100); ctx.fillStyle = col('--ink'); ctx.font = 'bold 22px sans-serif'; ctx.textAlign = 'right'; ctx.fillText(`${E.midiName(k)}  ${d > 0 ? '+' : ''}${d}`, W - 10, 28); ctx.textAlign = 'left'; }
+}
+
 function stopRun() {
   const R = st.run; if (!R) return;
+  if (R.kind === 'mon') { stopMonitor(); return; }
   cancelAnimationFrame(R.raf);
   if (R.kind === 'rec') {
     L.AU.rec = false; st.run = null;

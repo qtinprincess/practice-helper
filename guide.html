@@ -352,7 +352,14 @@ footer{margin-top:48px;font-size:13px;color:var(--muted)}
     <li>戴上耳機，按 <span class="ui pri">開始跟唱</span>，跟著錄音唱。灰色粗線是標準的旋律，彩色點是自己的聲音：綠＝準、黃＝差一點、紅＝偏離。</li>
     <li>唱完會有分數，以及每一句偏高、偏低、慢了多少的提醒。男生唱女生的歌（差八度）也算對。</li>
   </ol>
-  <div class="warnbox">請使用自己或老師錄的清唱，或有權使用的人聲音檔。流行歌的 mp3 有樂團伴奏，抓不到主旋律；YouTube 影片無法分析。有版權的歌曲，小幫手不會提供樂譜或歌詞。</div>
+  <h3>用 YouTube 歌曲或合唱樂譜</h3>
+  <ul>
+    <li>在跟唱頁的「3. 用 YouTube 歌曲或合唱樂譜」貼上 YouTube 網址，歌曲會直接在頁面裡播放，也會存在清單裡方便下次點選。</li>
+    <li>按「開始聽我唱」，小幫手會即時畫出你唱的音高，唱完告訴你長音準不準、穩不穩、有沒有越唱越低。<b>YouTube 的聲音無法分析，所以不會比對旋律對不對。</b></li>
+    <li>想要每個音都評分：按「匯入合唱樂譜（MusicXML）」，匯入後在「我的聲部」選自己的聲部。合唱樂譜可以到 <a href="https://www.cpdl.org" target="_blank" rel="noopener">CPDL 合唱公版樂譜庫</a> 或 <a href="https://musescore.com/sheetmusic" target="_blank" rel="noopener">MuseScore.com</a> 找。</li>
+    <li>練習頁的「示範錄音・樂團伴奏」也可以存 YouTube 連結，按「在頁面播放」就能邊看邊聽。</li>
+  </ul>
+  <div class="warnbox">請使用自己或老師錄的清唱，或有權使用的人聲音檔。流行歌的 mp3 有樂團伴奏，抓不到主旋律；YouTube 影片只能播放、無法分析。有版權的歌曲，小幫手不會提供樂譜或歌詞。</div>
 </section>
 
 <section id="kids">
@@ -395,16 +402,16 @@ footer{margin-top:48px;font-size:13px;color:var(--muted)}
   <h3>紙本或照片樂譜</h3>
   <ol class="steps">
     <li>把樂譜拍清楚（整頁、不要歪、光線均勻），或使用 PDF。</li>
-    <li>上傳給 Claude，說：「幫我轉成練琴小幫手格式」。（請使用自己擁有或公版的樂譜。）要練直笛的話請一起說明是高音直笛或中音直笛。</li>
+    <li>上傳給 <a href="https://claude.ai" target="_blank" rel="noopener">Claude</a>，說：「幫我轉成練琴小幫手格式」。（請使用自己擁有或公版的樂譜。）要練直笛的話請一起說明是高音直笛或中音直笛。</li>
     <li>到「曲庫」頁，把 Claude 給的文字貼進框框，按 <span class="ui pri">加入曲庫</span>。</li>
     <li><b>一定要核對</b>：在練習頁對照原譜，看調號、拍號、每個音和節奏是否一樣，並按「聆聽示範」聽一次。有錯就告訴 Claude 第幾小節錯了，請它修正。</li>
   </ol>
   <h3>不用拍照的快速匯入</h3>
   <ul>
-    <li><b>MuseScore.com</b>：公版曲（古典、民謠）可免費下載 MusicXML；有版權的曲子需要購買授權（MuseScore PRO）。</li>
-    <li><b>OpenScore</b>：公版樂譜，免費、可任意使用。放在 GitHub 上的檔案可以直接貼網址匯入。</li>
-    <li><b>IMSLP</b>：最大的公版樂譜庫，多數是 PDF，部分樂譜附 MusicXML。</li>
-    <li><b>只有 PDF</b>：用免費的 MuseScore 4「匯入 PDF」或 Audiveris 轉成 MusicXML。轉換常有小錯，匯入後一定要對照原譜。</li>
+    <li><b><a href="https://musescore.com/sheetmusic" target="_blank" rel="noopener">MuseScore.com</a></b>：公版曲（古典、民謠）可免費下載 MusicXML；有版權的曲子需要購買授權（MuseScore PRO）。</li>
+    <li><b><a href="https://musescore.com/openscore" target="_blank" rel="noopener">OpenScore</a></b>：公版樂譜，免費、可任意使用。放在 GitHub 上的檔案可以直接貼網址匯入。</li>
+    <li><b><a href="https://imslp.org" target="_blank" rel="noopener">IMSLP</a></b>：最大的公版樂譜庫，多數是 PDF，部分樂譜附 MusicXML。</li>
+    <li><b>只有 PDF</b>：用免費的 <a href="https://musescore.org/zh-hant/download" target="_blank" rel="noopener">MuseScore 4</a>「匯入 PDF」或 <a href="https://github.com/Audiveris/audiveris/releases" target="_blank" rel="noopener">Audiveris</a> 轉成 MusicXML。轉換常有小錯，匯入後一定要對照原譜。</li>
     <li>曲庫頁可以<b>一次拖曳好幾個檔案</b>進來，也可以貼 MusicXML 的網址匯入（網站允許才行，不允許時請先下載再拖曳）。</li>
   </ul>
   <h3>MusicXML 檔</h3>
