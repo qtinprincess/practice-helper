@@ -255,7 +255,7 @@ footer{margin-top:48px;font-size:13px;color:var(--muted)}
     <li><b>允許麥克風</b>：按右上角 <span class="ui pri">開啟</span>，瀏覽器問「要允許使用麥克風嗎」，選允許。有多支麥克風時，在「輸入裝置」選夾式麥克風。</li>
     <li><b>測量環境噪音</b>：按 <span class="ui">測量環境噪音（安靜 2 秒）</span>，這 2 秒內保持安靜。小幫手會記住環境有多吵，之後不會把雜音當成琴聲。</li>
     <li><b>延遲校正</b>：戴上平常練琴用的耳機，按 <span class="ui">開始校正</span>。先聽到 2 聲預備，接著 8 聲，請跟著拍手（或用弓拉短音）。顯示「已校正：○○ 毫秒」就完成了。<b>這一步決定節奏判斷準不準，請一定要做。</b></li>
-    <li><b>標準音 A</b>：依比賽伴奏鋼琴或老師指示，選 440 或 442 Hz。</li>
+    <li><b>標準音 A</b>：依比賽伴奏鋼琴或老師指示，選 440 或 442 赫茲。</li>
   </ol>
 </section>
 
@@ -267,7 +267,7 @@ footer{margin-top:48px;font-size:13px;color:var(--muted)}
     <div class="lamp"><b><i style="background:var(--warn)"></i>黃燈</b><p>稍微不準。看下方說明，修正後再拉一次。</p></div>
     <div class="lamp"><b><i style="background:var(--bad)"></i>紅燈</b><p>錯音、漏音，或偏差太大。這一小節需要重拉。</p></div>
   </div>
-  <p>每個音符本身也會變色，音符上方的數字是偏了幾 cents，下方的箭頭是節奏問題：</p>
+  <p>每個音符本身也會變色，音符上方的數字是偏了幾 音分，下方的箭頭是節奏問題：</p>
   <div class="sheet" role="img" aria-label="示意：一小節裡有正確、偏高、偏低、錯音和延遲的音符">
     <svg viewBox="0 0 640 150">
       <g stroke="#1c211f" stroke-width="1">
@@ -285,7 +285,7 @@ footer{margin-top:48px;font-size:13px;color:var(--muted)}
         <text x="530" y="128" text-anchor="middle" font-size="15" font-weight="700" fill="#cf4339">→</text>
       </g>
       <g font-size="12" fill="#5f6964" text-anchor="middle">
-        <text x="90" y="146">正確</text><text x="200" y="146">偏高 18 cents</text><text x="310" y="146">偏低 14 cents</text><text x="420" y="146">錯音／漏音</text><text x="530" y="146">音對但延遲</text>
+        <text x="90" y="146">正確</text><text x="200" y="146">偏高 18 音分</text><text x="310" y="146">偏低 14 音分</text><text x="420" y="146">錯音／漏音</text><text x="530" y="146">音對但延遲</text>
       </g>
     </svg>
   </div>
@@ -293,7 +293,7 @@ footer{margin-top:48px;font-size:13px;color:var(--muted)}
     <span><i style="background:var(--ok)"></i>綠：正確</span><span><i style="background:var(--sharp)"></i>橙：偏高</span><span><i style="background:var(--flat)"></i>藍：偏低</span><span><i style="background:var(--bad)"></i>紅：錯音・漏音</span>
     <span><b>←</b> 提前　<b>→</b> 延遲　<b>⌐</b> 音太短</span>
   </div>
-  <div class="note"><b>什麼是 cents？</b>　100 cents 等於一個半音（例如 A 到 A♯）。10 cents 是訓練有素的耳朵聽得出來的差距，也是比賽模式綠燈的標準。</div>
+  <div class="note"><b>什麼是 音分？</b>　100 音分 等於一個半音（例如 A 到 A♯）。10 音分 是訓練有素的耳朵聽得出來的差距，也是比賽模式綠燈的標準。</div>
 </section>
 
 <section id="modes">
@@ -302,15 +302,15 @@ footer{margin-top:48px;font-size:13px;color:var(--muted)}
   <div class="modes">
     <div class="mode"><b>初學模式</b><span class="when">第一次練新曲子</span>
       <p>游標停在每個音上，等你拉對才往下走，可以慢慢想、隨時停下來。畫面會寫出要拉哪個音和指法。想不起來時按 <span class="ui">提示音</span> 聽一次。</p>
-      <p class="muted" style="font-size:14px">只判斷音準：±25 cents 內綠燈。</p>
+      <p class="muted" style="font-size:14px">只判斷音準：±25 音分 內綠燈。</p>
       <div class="pass">過關：整首拉完，沒有紅燈。</div></div>
     <div class="mode"><b>進階模式</b><span class="when">音都會了，開始對節奏</span>
       <p>先聽一小節預備拍，再跟著節拍器拉。音準和節奏同時判斷。可以把速度調慢、勾選「循環」反覆練同一段。</p>
-      <p class="muted" style="font-size:14px">音準 ±15 cents、起音 ±60 毫秒內綠燈。</p>
+      <p class="muted" style="font-size:14px">音準 ±15 音分、起音 ±60 毫秒內綠燈。</p>
       <div class="pass">過關：原速（100%）連續 3 次全綠。</div></div>
     <div class="mode"><b>比賽模式</b><span class="when">上台前的模擬考</span>
       <p>從第一小節連續拉到最後一小節，中途不停，沒有伴奏旋律提示。採用參考全國賽要求的嚴格標準。</p>
-      <p class="muted" style="font-size:14px">音準 ±10 cents、起音 ±40 毫秒內綠燈。</p>
+      <p class="muted" style="font-size:14px">音準 ±10 音分、起音 ±40 毫秒內綠燈。</p>
       <div class="pass">達標：全曲綠燈。代表音準與節奏通過檢查，音樂表現請老師再聽聽看。</div></div>
   </div>
   <h3>選範圍、循環、調速度</h3>
@@ -326,15 +326,15 @@ footer{margin-top:48px;font-size:13px;color:var(--muted)}
   <h2>錯誤怎麼改</h2>
   <p>報告的「需要改的地方」會一條一條寫出來，點一下就會跳到那一小節。常見的說明和改法：</p>
   <div class="fix">
-    <div><code>偏高 18 cents</code><span>小提琴：按弦的手指往琴頭方向（靠近自己）挪一點點。直笛：吹氣輕一點。</span></div>
-    <div><code>偏低 14 cents</code><span>小提琴：手指往琴橋方向挪一點點。直笛：吹氣稍微加強，檢查手指有沒有把孔蓋滿。</span></div>
+    <div><code>偏高 18 音分</code><span>小提琴：按弦的手指往琴頭方向（靠近自己）挪一點點。直笛：吹氣輕一點。</span></div>
+    <div><code>偏低 14 音分</code><span>小提琴：手指往琴橋方向挪一點點。直笛：吹氣稍微加強，檢查手指有沒有把孔蓋滿。</span></div>
     <div><code>拉成 G♯4（應為 G4）</code><span>按錯音了。看報告下方的「參考指法」，先用初學模式把這個音拉對。常見原因是忘了調號的升降記號。</span></div>
     <div><code>漏音：沒有聽到這個音</code><span>可能沒拉到、弓壓太輕，或換弦時弓碰到了別條弦。</span></div>
     <div><code>提前 0.12 秒</code><span>搶拍了。心裡數拍子，等到拍點再出弓。可以把速度調慢練。</span></div>
     <div><code>延遲 0.06 秒</code><span>太晚進來。提早準備下一個音的手指，換弦動作再快一點。</span></div>
     <div><code>四分音符演奏時間不足</code><span>音太早停掉。弓要一直拉到下一個音開始，數滿拍子。</span></div>
     <div><code>休止符沒有停下來</code><span>休止符的時候要讓聲音停住，把弓停在弦上或離弦。</span></div>
-    <div><code>雙音完全五度太寬 12 cents：把 A4 調低約 12 cents</code><span>兩個音的距離太大。照建議把那一個音的手指往琴頭方向挪一點，直到聽不到「嗡嗡」聲。「太窄」則相反。</span></div>
+    <div><code>雙音完全五度太寬 12 音分：把 A4 調低約 12 音分</code><span>兩個音的距離太大。照建議把那一個音的手指往琴頭方向挪一點，直到聽不到「嗡嗡」聲。「太窄」則相反。</span></div>
     <div><code>雙音裡的 A4 沒有聽到</code><span>只拉到一條弦，或另一個音按錯。弓要同時壓在兩條弦上。</span></div>
     <div><code>先拉錯 2 次（聽到 A♯4）</code><span>初學模式才有：表示拉對之前試錯了幾次，以及錯成哪個音。</span></div>
   </div>
@@ -393,7 +393,7 @@ footer{margin-top:48px;font-size:13px;color:var(--muted)}
   <h3>有樂譜：合唱分部練習</h3>
   <ul>
     <li>匯入合唱的 MusicXML（聲部名稱有 Soprano／Alto／Tenor／Bass 或女高、女低、男高、男低，會自動辨認），在「我的聲部」選自己的聲部，其他聲部當伴奏。範例「小星星（二部合唱）」「發聲練習」可以先試。</li>
-    <li>人聲的容許度比樂器稍寬（例如比賽模式音準綠燈 ±15 cents），並會提醒人聲常見問題：起音從下面滑上來、尾音往下掉、聲音搖晃太大、越唱越低。</li>
+    <li>人聲的容許度比樂器稍寬（例如比賽模式音準綠燈 ±15 音分），並會提醒人聲常見問題：起音從下面滑上來、尾音往下掉、聲音搖晃太大、越唱越低。</li>
     <li>男高音照慣例寫在高音譜號、實際唱低八度，小幫手會自動換算。</li>
     <li>調音頁的 <span class="ui">合唱起音器</span>：按「主和弦」聽調性，再按自己聲部的起音。</li>
   </ul>
@@ -478,7 +478,7 @@ footer{margin-top:48px;font-size:13px;color:var(--muted)}
     <li><b>改善幅度</b>：最早幾次和最近幾次的平均分數比較。</li>
     <li><b>分數變化圖</b>：每個點是一次練習，顏色代表模式。</li>
     <li><b>最常出錯的小節</b>：點一下直接去練那一小節。</li>
-    <li><b>常偏高或偏低的音</b>：例如「C♯5 +16」表示 C♯5 習慣拉高 16 cents，練音階時要特別注意。</li>
+    <li><b>常偏高或偏低的音</b>：例如「C♯5 +16」表示 C♯5 習慣拉高 16 音分，練音階時要特別注意。</li>
     <li><b>節奏穩定度</b>變化，以及每一次練習的明細。</li>
   </ul>
   <p class="muted">分數算法：綠燈小節 100 分、黃燈 60 分、紅燈 0 分，取平均。</p>
@@ -490,18 +490,18 @@ footer{margin-top:48px;font-size:13px;color:var(--muted)}
   <div class="tbl"><table>
     <thead><tr><th>模式</th><th>音準綠燈</th><th>音準黃燈</th><th>起音綠燈</th><th>起音黃燈</th><th>其他判斷</th></tr></thead>
     <tbody>
-      <tr><td>初學</td><td class="num">±25 cents</td><td class="num">±50 cents</td><td>不判斷</td><td>不判斷</td><td>試錯 1–2 次黃燈、3 次以上紅燈</td></tr>
-      <tr><td>進階</td><td class="num">±15 cents</td><td class="num">±35 cents</td><td class="num">±60 毫秒</td><td class="num">±130 毫秒</td><td rowspan="2">音長不足 75% 黃燈、不足 45% 紅燈；休止符有聲音黃燈；錯音、漏音紅燈</td></tr>
-      <tr><td><b>比賽</b></td><td class="num"><b>±10 cents</b></td><td class="num">±25 cents</td><td class="num"><b>±40 毫秒</b></td><td class="num">±90 毫秒</td></tr>
+      <tr><td>初學</td><td class="num">±25 音分</td><td class="num">±50 音分</td><td>不判斷</td><td>不判斷</td><td>試錯 1–2 次黃燈、3 次以上紅燈</td></tr>
+      <tr><td>進階</td><td class="num">±15 音分</td><td class="num">±35 音分</td><td class="num">±60 毫秒</td><td class="num">±130 毫秒</td><td rowspan="2">音長不足 75% 黃燈、不足 45% 紅燈；休止符有聲音黃燈；錯音、漏音紅燈</td></tr>
+      <tr><td><b>比賽</b></td><td class="num"><b>±10 音分</b></td><td class="num">±25 音分</td><td class="num"><b>±40 毫秒</b></td><td class="num">±90 毫秒</td></tr>
       <tr><td>雙音</td><td colspan="2">音程誤差，依各模式的音準標準</td><td colspan="2">同上（起音看音量變化）</td><td>預設純律；可在設定改平均律。八度、同音只能粗略判斷</td></tr>
-      <tr><td>調音器</td><td class="num">±3 cents</td><td class="num">±10 cents</td><td colspan="3">空弦調到綠色才算調準</td></tr>
+      <tr><td>調音器</td><td class="num">±3 音分</td><td class="num">±10 音分</td><td colspan="3">空弦調到綠色才算調準</td></tr>
     </tbody>
   </table></div>
   <h3>比賽前的自我檢查清單</h3>
   <ul>
-    <li>調音器四條弦都在 ±3 cents 內。</li>
+    <li>調音器四條弦都在 ±3 音分 內。</li>
     <li>比賽模式、速度 100%、全曲綠燈。</li>
-    <li>音準平均誤差在 ±5 cents 內，沒有明顯偏高或偏低傾向。</li>
+    <li>音準平均誤差在 ±5 音分 內，沒有明顯偏高或偏低傾向。</li>
     <li>節奏穩定度在 ±25 毫秒內，速度判斷為「速度穩定」。</li>
     <li>不同天練習都能重現上面的結果（看紀錄頁分數變化）。</li>
   </ul>
@@ -513,10 +513,10 @@ footer{margin-top:48px;font-size:13px;color:var(--muted)}
   <h2>給老師</h2>
   <h3>評分原理</h3>
   <ul>
-    <li><b>音準引擎</b>：每秒約分析 90 次音高，判斷音名與八度，以每個音中段的中位數計算偏差（cents），避免起音和抖音影響判斷。</li>
+    <li><b>音準引擎</b>：每秒約分析 90 次音高，判斷音名與八度，以每個音中段的中位數計算偏差（音分），避免起音和抖音影響判斷。</li>
     <li><b>節奏引擎</b>：從音高變化或音量變化找出每個音真正開始的時間，和節拍器的拍點比較；另外檢查音長、休止符和整首速度是否越來越快或越來越慢。</li>
     <li>兩個引擎各自評分，取較差的結果作為該音的燈號，再取小節內最差的音作為小節燈號。</li>
-    <li>開發測試時，用合成的小提琴音色故意加入偏高 18 cents、延遲 0.12 秒、錯一個半音、音長只有一半等錯誤，全部都正確判出；音高量測誤差在 1 cent 以內，拍點誤差約 ±15 毫秒。實際使用的準確度會受麥克風、環境噪音和延遲校正影響。</li>
+    <li>開發測試時，用合成的小提琴音色故意加入偏高 18 音分、延遲 0.12 秒、錯一個半音、音長只有一半等錯誤，全部都正確判出；音高量測誤差在 1 cent 以內，拍點誤差約 ±15 毫秒。實際使用的準確度會受麥克風、環境噪音和延遲校正影響。</li>
   </ul>
   <h3>建議的課堂用法</h3>
   <ol class="steps">
@@ -548,7 +548,7 @@ footer{margin-top:48px;font-size:13px;color:var(--muted)}
     <dt>直笛吹出來顯示高了一個八度</dt>
     <dd>高音直笛的實際聲音本來就比譜高一個八度，小幫手已自動換算。請確認樂曲資訊顯示的是「高音直笛」；如果樂譜被設成小提琴，請 Claude 把樂器改成高音直笛再匯入一次。</dd>
     <dt>雙音是怎麼判斷的？</dt>
-    <dd>兩個音同時響時聲音會混在一起，單音偵測會聽錯（D＋A 的五度會被聽成更低的 D）。所以雙音改用頻譜分析：樂譜已經知道是哪兩個音，小幫手就到兩個音各自「不重疊的泛音」位置量出實際音高，再計算兩音的音程。比賽評審聽雙音，重點是音程是否純淨、有沒有「嗡嗡」的拍音，所以預設用<b>純律</b>判斷（五度 702 cents、大三度 386 cents）。報告會建議調哪一個音：有空弦時以空弦為準調另一個音，沒有空弦時以低音為準調高音。八度和同音因為泛音完全重疊，只能粗略判斷，最多亮黃燈。</dd>
+    <dd>兩個音同時響時聲音會混在一起，單音偵測會聽錯（D＋A 的五度會被聽成更低的 D）。所以雙音改用頻譜分析：樂譜已經知道是哪兩個音，小幫手就到兩個音各自「不重疊的泛音」位置量出實際音高，再計算兩音的音程。比賽評審聽雙音，重點是音程是否純淨、有沒有「嗡嗡」的拍音，所以預設用<b>純律</b>判斷（五度 702 音分、大三度 386 音分）。報告會建議調哪一個音：有空弦時以空弦為準調另一個音，沒有空弦時以低音為準調高音。八度和同音因為泛音完全重疊，只能粗略判斷，最多亮黃燈。</dd>
     <dt>上傳的錄音「對齊可信度」很低</dt>
     <dd>確認錄音和樂譜是同一首、同一個版本、同一個調，而且是單一樂器。開頭和結尾有很長的空白或講話也會影響，請剪掉後再上傳。</dd>
     <dt>小琴一直說話太吵</dt>
@@ -566,7 +566,7 @@ footer{margin-top:48px;font-size:13px;color:var(--muted)}
   <div class="card">
     <ul class="daily">
       <li><span>夾好麥克風、戴耳機、按「開啟」<br><small>音量條會動</small></span></li>
-      <li><span>四條弦都調到綠色<br><small>調音頁，±3 cents</small></span></li>
+      <li><span>四條弦都調到綠色<br><small>調音頁，±3 音分</small></span></li>
       <li><span>D 大調音階：進階模式全綠<br><small>熱身 5 分鐘</small></span></li>
       <li><span>聽一次今天要練的曲子示範</span></li>
       <li><span>按「小琴陪你加強」，把紅燈小節練到過關</span></li>

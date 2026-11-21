@@ -70,7 +70,7 @@ E.MODES = {
   advanced: { name: '進階模式', short: '進階', wait: false, pg: 15, py: 35, rg: 60, ry: 130,
     desc: '跟著節拍器演奏，音準與節奏同時判斷。可以點選小節反覆練習，也可以調慢速度。' },
   contest: { name: '比賽模式', short: '比賽', wait: false, full: true, pg: 10, py: 25, rg: 40, ry: 90,
-    desc: '依設定速度從第一小節連續拉到最後，中途不停。採全國賽等級標準：音準 ±10 cents、起音 ±40 毫秒內才算綠燈。' }
+    desc: '依設定速度從第一小節連續拉到最後，中途不停。採全國賽等級標準：音準 ±10 音分、起音 ±40 毫秒內才算綠燈。' }
 };
 
 /* ---------- 小工具 ---------- */
@@ -722,7 +722,7 @@ E.pitchEngine = function (ev, frames, o) {
   }
   const near = dev.filter(c => Math.abs(c) <= 70);
   let c = median(near);
-  // 表情音準：導音（主音下方半音）可以偏高，最多 12 cents 不扣分
+  // 表情音準：導音（主音下方半音）可以偏高，最多 12 音分 不扣分
   if (o.expressive && o.leading && c > 0) c = Math.max(0, c - Math.min(12, c));
   const ac = Math.abs(c);
   const res = {
@@ -860,8 +860,8 @@ E.chordFrame = function (x, sr, targets, A) {
   const hz = sr / N;
   let gmax = -1e9; for (let k = Math.floor(120 / hz); k < Math.min(half - 1, 6000 / hz); k++) if (mag[k] > gmax) gmax = mag[k];
   const floor = gmax + Math.log(0.02); // 比最強峰值低 34 dB 以內才算有聲音
-  const peakNear = (f, cents, excl) => {
-    const k0 = Math.max(2, Math.floor(f * Math.pow(2, -cents / 1200) / hz)), k1 = Math.min(half - 2, Math.ceil(f * Math.pow(2, cents / 1200) / hz));
+  const peakNear = (f, 音分, excl) => {
+    const k0 = Math.max(2, Math.floor(f * Math.pow(2, -音分 / 1200) / hz)), k1 = Math.min(half - 2, Math.ceil(f * Math.pow(2, 音分 / 1200) / hz));
     let best = null;
     for (let k = k0; k <= k1; k++) {
       if (mag[k] < mag[k - 1] || mag[k] < mag[k + 1] || mag[k] < floor) continue;
@@ -1151,7 +1151,7 @@ E.describe = function (song, ev, res) {
       const heardW = p.heard - inst.transpose;
       out.push({ lv: 'r', t: p.octave ? `${inst.verb}高低差了一個八度` : `${inst.verb}成 ${E.midiName(heardW, song.fifths < 0)}（應為 ${E.noteLabel(ev.note)}）` });
     } else if (p.status === 'sharp' || p.status === 'flat') {
-      out.push({ lv: p.level, t: `偏${p.status === 'sharp' ? '高' : '低'} ${Math.round(Math.abs(p.cents))} cents` });
+      out.push({ lv: p.level, t: `偏${p.status === 'sharp' ? '高' : '低'} ${Math.round(Math.abs(p.cents))} 音分` });
     } else if (p.status === 'chordmiss') {
       (p.missing || []).forEach(x => {
         const nm = E.midiName(x.m - inst.transpose, song.fifths < 0);
@@ -1162,16 +1162,16 @@ E.describe = function (song, ev, res) {
       p.pairs.forEach(pr => {
         if (pr.level === 'g') return;
         const nm = m => E.midiName(m - inst.transpose, song.fifths < 0);
-        const who = `：把 ${nm(pr.fix.m)} 調${pr.fix.by > 0 ? '高' : '低'}約 ${Math.round(Math.abs(pr.fix.by))} cents`;
-        out.push({ lv: pr.level, t: `雙音${E.intervalName(pr.semis)}太${pr.dev > 0 ? '寬' : '窄'} ${Math.round(Math.abs(pr.dev))} cents${who}${pr.rough ? '（八度、同音只能粗略判斷）' : ''}` });
+        const who = `：把 ${nm(pr.fix.m)} 調${pr.fix.by > 0 ? '高' : '低'}約 ${Math.round(Math.abs(pr.fix.by))} 音分`;
+        out.push({ lv: pr.level, t: `雙音${E.intervalName(pr.semis)}太${pr.dev > 0 ? '寬' : '窄'} ${Math.round(Math.abs(pr.dev))} 音分${who}${pr.rough ? '（八度、同音只能粗略判斷）' : ''}` });
       });
-      if (p.shift != null) out.push({ lv: 'y', t: `兩個音一起偏${p.shift > 0 ? '高' : '低'}約 ${Math.round(Math.abs(p.shift))} cents` });
+      if (p.shift != null) out.push({ lv: 'y', t: `兩個音一起偏${p.shift > 0 ? '高' : '低'}約 ${Math.round(Math.abs(p.shift))} 音分` });
     }
   }
   if (p && p.vocal) {
-    if (p.vocal.scoop) out.push({ lv: 'y', t: `起音從下面滑上來（低了約 ${p.vocal.scoop} cents 才到位），要一開口就唱在音上` });
-    if (p.vocal.droop) out.push({ lv: 'y', t: `尾音往下掉約 ${p.vocal.droop} cents，長音要用氣息撐到最後` });
-    if (p.vocal.wobble) out.push({ lv: 'y', t: `聲音搖晃太大（約 ±${p.vocal.wobble} cents），放鬆喉嚨、穩住氣息` });
+    if (p.vocal.scoop) out.push({ lv: 'y', t: `起音從下面滑上來（低了約 ${p.vocal.scoop} 音分 才到位），要一開口就唱在音上` });
+    if (p.vocal.droop) out.push({ lv: 'y', t: `尾音往下掉約 ${p.vocal.droop} 音分，長音要用氣息撐到最後` });
+    if (p.vocal.wobble) out.push({ lv: 'y', t: `聲音搖晃太大（約 ±${p.vocal.wobble} 音分），放鬆喉嚨、穩住氣息` });
   }
   if (res.wait && res.wait.wrong) {
     const heard = [...new Set(res.wait.heard.map(m => E.midiName(m - inst.transpose, song.fifths < 0)))].slice(0, 3).join('、');

@@ -60,7 +60,7 @@ S.render = function () {
         <label class="toggle"><input type="checkbox" id="singOct" ${L.settings.singOct !== false ? 'checked' : ''}>男生、女生差八度也算對</label>
         <label class="mini-field">錄音音量 <input type="range" id="singVol" min="0" max="1" step="0.05" value="${L.settings.singVol ?? 0.7}"></label>
       </div>
-      <p class="ens-note">戴耳機唱，麥克風只收你的聲音。綠點＝準（±25 cents）、黃點＝差一點、紅點＝偏離較多。</p>
+      <p class="ens-note">戴耳機唱，麥克風只收你的聲音。綠點＝準（±25 音分）、黃點＝差一點、紅點＝偏離較多。</p>
     </div>
   </div>
   <div class="card panel" style="margin-top:18px">
@@ -244,14 +244,14 @@ function stopMonitor() {
 }
 function monReport(r) {
   const tips = [];
-  if (r.bias < -15) tips.push(`長音整體偏低約 ${-r.bias} cents：吸飽氣，想著往上唱。`);
-  if (r.bias > 15) tips.push(`長音整體偏高約 ${r.bias} cents：放鬆喉嚨，不要擠。`);
+  if (r.bias < -15) tips.push(`長音整體偏低約 ${-r.bias} 音分：吸飽氣，想著往上唱。`);
+  if (r.bias > 15) tips.push(`長音整體偏高約 ${r.bias} 音分：放鬆喉嚨，不要擠。`);
   if (r.shaky > 30) tips.push('不少長音在搖晃，用氣息把聲音穩住。');
   if (r.inTune < 80) tips.push('有 ' + (100 - r.inTune) + '% 的長音沒有唱在準的音高上，可以先到「調音」用合唱起音器聽一下音，再唱一次。');
   if (r.drift != null && r.drift < -20) tips.push('後面比前面低，長句子要留氣、句尾撐住。');
   if (!tips.length) tips.push('長音唱得很準又很穩！');
   $('#monReport').innerHTML = `<div class="coach" style="margin-top:12px"><h3>聽你唱的結果（僅供參考）</h3>
-    ${r.n} 個長音中，${r.inTune}% 唱在準的音高上（±25 cents）；音域 ${r.lo}–${r.hi}。<br>${tips.join('<br>')}
+    ${r.n} 個長音中，${r.inTune}% 唱在準的音高上（±25 音分）；音域 ${r.lo}–${r.hi}。<br>${tips.join('<br>')}
     <br><span class="muted">這裡沒有和歌曲比對，旋律唱得對不對、咬字和表情，請照指揮老師的要求。</span></div>`;
 }
 function drawMon(now, me) {
@@ -390,20 +390,20 @@ function finish(stopped) {
 function report(r) {
   const tips = [];
   if (r.cover < 50) tips.push('有不少句子沒有唱到或聲音太小，靠近麥克風、唱大聲一點。');
-  if (r.bias != null && r.bias < -15) tips.push(`整體偏低約 ${-r.bias} cents：吸飽氣、想著「往上」唱，嘴巴打開一點。`);
-  if (r.bias != null && r.bias > 15) tips.push(`整體偏高約 ${r.bias} cents：肩膀和喉嚨放鬆，不要擠。`);
-  if (r.drift != null && r.drift < -20) tips.push(`越唱越低（後面比前面低了約 ${-r.drift} cents），長句子要留氣、句尾撐住。`);
+  if (r.bias != null && r.bias < -15) tips.push(`整體偏低約 ${-r.bias} 音分：吸飽氣、想著「往上」唱，嘴巴打開一點。`);
+  if (r.bias != null && r.bias > 15) tips.push(`整體偏高約 ${r.bias} 音分：肩膀和喉嚨放鬆，不要擠。`);
+  if (r.drift != null && r.drift < -20) tips.push(`越唱越低（後面比前面低了約 ${-r.drift} 音分），長句子要留氣、句尾撐住。`);
   if (r.lag > 150) tips.push(`你平均比錄音慢 ${(r.lag / 1000).toFixed(2)} 秒，先多聽幾次，記住旋律再跟。`);
   if (r.lag < -150) tips.push(`你平均比錄音快 ${(-r.lag / 1000).toFixed(2)} 秒，不要急，跟著錄音的拍子。`);
   if (!tips.length) tips.push('唱得很穩！可以試試不開錄音聲音（音量拉到 0）自己唱一次。');
   const rows = r.phrases.map(p => {
     const lv = p.cover < 0.5 ? 'r' : p.acc >= 0.8 ? 'g' : p.acc >= 0.55 ? 'y' : 'r';
-    const msg = p.cover < 0.5 ? '這一句沒唱到或太小聲' : p.bias != null && Math.abs(p.bias) > 15 ? `整句偏${p.bias > 0 ? '高' : '低'} ${Math.round(Math.abs(p.bias))} cents` : p.spread > 40 ? '音高搖晃，練習用氣息穩住' : '很準';
+    const msg = p.cover < 0.5 ? '這一句沒唱到或太小聲' : p.bias != null && Math.abs(p.bias) > 15 ? `整句偏${p.bias > 0 ? '高' : '低'} ${Math.round(Math.abs(p.bias))} 音分` : p.spread > 40 ? '音高搖晃，練習用氣息穩住' : '很準';
     return `<li><span class="dot" style="background:var(--${lv === 'g' ? 'ok' : lv === 'y' ? 'warn' : 'bad'})"></span><div><div class="w">第 ${p.i} 句（${fmt(p.t0)}–${fmt(p.t1)}）</div><div class="t">${msg}　<span class="muted num">準確 ${Math.round(p.acc * 100)}%</span></div></div></li>`;
   }).join('');
   $('#singReport').innerHTML = `<div class="report"><div class="card"><div class="eyebrow">跟唱結果${r.stopped ? '・中途停止' : ''}</div>
     <div class="scorebig"><b class="num">${r.score}</b><span class="muted">分</span></div>
-    <dl class="kv"><dt>唱到的比例</dt><dd class="num">${r.cover}%</dd><dt>唱到的音準確度</dt><dd class="num">${r.acc}%（±50 cents 內）</dd><dt>整體音高</dt><dd class="num">${r.bias == null ? '—' : (Math.abs(r.bias) < 10 ? '很準' : (r.bias > 0 ? '偏高 ' : '偏低 ') + Math.abs(r.bias) + ' cents')}</dd><dt>拍子</dt><dd class="num">${Math.abs(r.lag) < 100 ? '跟得很好' : r.lag > 0 ? '慢 ' + (r.lag / 1000).toFixed(2) + ' 秒' : '快 ' + (-r.lag / 1000).toFixed(2) + ' 秒'}</dd></dl>
+    <dl class="kv"><dt>唱到的比例</dt><dd class="num">${r.cover}%</dd><dt>唱到的音準確度</dt><dd class="num">${r.acc}%（±50 音分 內）</dd><dt>整體音高</dt><dd class="num">${r.bias == null ? '—' : (Math.abs(r.bias) < 10 ? '很準' : (r.bias > 0 ? '偏高 ' : '偏低 ') + Math.abs(r.bias) + ' 音分')}</dd><dt>拍子</dt><dd class="num">${Math.abs(r.lag) < 100 ? '跟得很好' : r.lag > 0 ? '慢 ' + (r.lag / 1000).toFixed(2) + ' 秒' : '快 ' + (-r.lag / 1000).toFixed(2) + ' 秒'}</dd></dl>
     <div class="coach"><h3>小琴的練習小撇步</h3>${tips.map(esc).join('<br>')}<br><span class="muted">合唱的咬字、音色和表情，請照指揮老師的要求。</span></div></div>
     <div class="card"><h3>每一句</h3><ul class="issues">${rows || '<li>沒有資料</li>'}</ul></div></div>`;
 }

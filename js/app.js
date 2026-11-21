@@ -190,7 +190,7 @@ function loadSong(id) {
   st.events = E.buildEvents(st.song);
   st.shift = (settings.shiftBy || {})[raw.id] || 0;
   if ($('#shiftOut')) $('#shiftOut').textContent = (st.shift > 0 ? '+' : '') + st.shift;
-  // 人聲要聽得到更低的音（男低音約 80 Hz）
+  // 人聲要聽得到更低的音（男低音約 80 赫茲）
   if (AU.ctx && AU.mic) AU.det = E.makeDetector(AU.ctx.sampleRate, inst().vocal || inst().low < 50 ? 70 : 150);
   st.ref = null; loadRef();
   st.results = []; st.sel = null; st.coach = null; st.lastRec = null; st.lastSum = null;
@@ -1330,18 +1330,18 @@ function renderReport() {
     : groups.length
       ? `<div class="coach"><h3>小琴的練習小撇步</h3>可以先把${groups.slice(0, 3).map(g => `第 ${g[0] + 1}${g[0] !== g[1] ? '–' + (g[1] + 1) : ''} 小節`).join('、')}單獨拿出來，用 70% 速度循環練。連續 3 次綠燈會自動加速 10%，到原速後換下一段。（如果老師有指定不同的練法，請照老師的方式。）<br><button class="btn primary" id="btnCoach">小琴陪你加強</button></div>`
       : `<div class="coach"><h3>小琴的練習小撇步</h3>${sum.mode === 'contest' ? '全部綠燈！音準和節奏都通過比賽模式的檢查。音色和音樂表現，記得上課時請老師聽聽看喔！' : '這次全部綠燈！可以提高速度，或改用比賽模式從頭到尾拉一次。'}</div>`;
-  const bias = sum.pitchBias == null ? '' : Math.abs(sum.pitchBias) < 3 ? '沒有明顯偏向' : sum.pitchBias > 0 ? `整體偏高 ${sum.pitchBias} cents` : `整體偏低 ${-sum.pitchBias} cents`;
+  const bias = sum.pitchBias == null ? '' : Math.abs(sum.pitchBias) < 3 ? '沒有明顯偏向' : sum.pitchBias > 0 ? `整體偏高 ${sum.pitchBias} 音分` : `整體偏低 ${-sum.pitchBias} 音分`;
   const drift = sum.drift == null ? '' : Math.abs(sum.drift) < 15 ? '速度穩定' : sum.drift < 0 ? '越拉越快' : '越拉越慢';
   el.innerHTML = `<div class="card">
       <div class="eyebrow">${esc(E.MODES[sum.mode].name)}${sum.refTiming ? '・照示範錄音速度' : sum.speed ? '・速度 ' + sum.speed + '%' : ''}${sum.partial ? '・中途停止' : ''}</div>
       <div class="scorebig"><b class="num">${sum.score}</b><span class="muted">分</span></div>
       <div class="lamps"><span><i style="background:var(--ok)"></i>${sum.counts.g} 小節</span><span><i style="background:var(--warn)"></i>${sum.counts.y} 小節</span><span><i style="background:var(--bad)"></i>${sum.counts.r} 小節</span></div>
       <dl class="kv">
-        <dt>音準平均誤差</dt><dd class="num">${sum.pitchAbs == null ? '—' : '±' + sum.pitchAbs + ' cents'}　<span class="muted">${bias}</span></dd>
+        <dt>音準平均誤差</dt><dd class="num">${sum.pitchAbs == null ? '—' : '±' + sum.pitchAbs + ' 音分'}　<span class="muted">${bias}</span></dd>
         ${sum.mode !== 'beginner' ? `<dt>節奏穩定度</dt><dd class="num">${sum.rhythmStd == null ? '—' : '±' + sum.rhythmStd + ' 毫秒'}　<span class="muted">${sum.rhythmMean == null ? '' : (Math.abs(sum.rhythmMean) < 15 ? '拍點準確' : sum.rhythmMean < 0 ? '習慣搶拍 ' + (-sum.rhythmMean) + ' 毫秒' : '習慣晚進 ' + sum.rhythmMean + ' 毫秒')}</span></dd>
         <dt>速度</dt><dd>${drift || '—'}</dd>` : ''}
-        ${sum.pitchDrift != null && Math.abs(sum.pitchDrift) >= 15 ? `<dt>音高走向</dt><dd class="num">${sum.pitchDrift < 0 ? '越' + inst().verb + '越低' : '越' + inst().verb + '越高'}（前後差約 ${Math.abs(sum.pitchDrift)} cents）</dd>` : ''}
-        ${sum.vibrato ? `<dt>抖音</dt><dd class="num">${sum.vibrato.n} 個長音有抖音，平均每秒 ${sum.vibrato.rate} 次、幅度 ±${sum.vibrato.width} cents<span class="muted">（僅供參考，抖音的速度與幅度請照老師要求）</span></dd>` : ''}
+        ${sum.pitchDrift != null && Math.abs(sum.pitchDrift) >= 15 ? `<dt>音高走向</dt><dd class="num">${sum.pitchDrift < 0 ? '越' + inst().verb + '越低' : '越' + inst().verb + '越高'}（前後差約 ${Math.abs(sum.pitchDrift)} 音分）</dd>` : ''}
+        ${sum.vibrato ? `<dt>抖音</dt><dd class="num">${sum.vibrato.n} 個長音有抖音，平均每秒 ${sum.vibrato.rate} 次、幅度 ±${sum.vibrato.width} 音分<span class="muted">（僅供參考，抖音的速度與幅度請照老師要求）</span></dd>` : ''}
       </dl>
       ${(st.dynNotes || []).length ? `<div class="dyn-notes"><b>音量與音色（僅供參考）</b><ul>${st.dynNotes.slice(0, 4).map(t => '<li>' + esc(t) + '</li>').join('')}</ul></div>` : ''}
       ${tolLine(sum.mode)}
@@ -1375,7 +1375,7 @@ function issueLi(it) {
 }
 function tolLine(mode) {
   const t = tolFor(mode);
-  return `<p class="muted" style="font-size:13px;margin-top:12px">標準：音準綠燈 ±${t.pg}、黃燈 ±${t.py} cents${t.rg != null ? `；起音綠燈 ±${t.rg}、黃燈 ±${t.ry} 毫秒` : '；不判斷節奏'}（可在設定調整）</p>`;
+  return `<p class="muted" style="font-size:13px;margin-top:12px">標準：音準綠燈 ±${t.pg}、黃燈 ±${t.py} 音分${t.rg != null ? `；起音綠燈 ±${t.rg}、黃燈 ±${t.ry} 毫秒` : '；不判斷節奏'}（可在設定調整）</p>`;
 }
 function measureDetail() {
   if (!st.sel || !st.song) return '';
@@ -1445,7 +1445,7 @@ function renderLog() {
         ${nList.length ? `<div class="blist">${nList.map(x => {
           const w = Math.min(50, Math.abs(x.c)) / 50 * 50;
           return `<div class="brow"><span>${esc(E.midiName(x.m, song && song.fifths < 0))}</span><span class="track"><span class="mid"></span><b style="${x.c >= 0 ? 'left:50%' : 'right:50%'};width:${w}%;background:${x.c >= 0 ? 'var(--sharp)' : 'var(--flat)'}"></b></span><span class="num" style="color:${x.c >= 0 ? 'var(--sharp)' : 'var(--flat)'}">${x.c > 0 ? '+' : ''}${x.c}</span></div>`;
-        }).join('')}</div><p class="muted" style="font-size:13px">左藍偏低、右橙偏高，單位 cents；至少出現 3 次才列入。${tr ? '音名為譜面寫法。' : ''}</p>` : '<p class="muted">資料還不夠，多練幾次就會出現。</p>'}
+        }).join('')}</div><p class="muted" style="font-size:13px">左藍偏低、右橙偏高，單位 音分；至少出現 3 次才列入。${tr ? '音名為譜面寫法。' : ''}</p>` : '<p class="muted">資料還不夠，多練幾次就會出現。</p>'}
       </div>
     </div>
     <div class="card panel" style="margin-top:18px"><h3>每次練習</h3><div class="tablewrap"><table>
@@ -1491,7 +1491,7 @@ function buildTuner() {
 }
 function renderStrings() {
   const host = $('#tStrings');
-  if (TU.mode === 'violin') host.innerHTML = stringsOf().map(([n, m]) => `<button data-m="${m}"><b>${n}</b><span class="num">${E.freq(m, settings.A).toFixed(1)} Hz</span></button>`).join('');
+  if (TU.mode === 'violin') host.innerHTML = stringsOf().map(([n, m]) => `<button data-m="${m}"><b>${n}</b><span class="num">${E.freq(m, settings.A).toFixed(1)} 赫茲</span></button>`).join('');
   else if (TU.mode === 'pipe') {
     // 起音器：主和弦＋每個聲部的第一個音
     const song = st.song, tonic = ((song.fifths * 7) % 12 + 12) % 12 + (song.minor ? 9 : 0);
@@ -1500,7 +1500,7 @@ function renderStrings() {
     const firsts = song.parts.map((p, i) => { const n = p.measures.flatMap(m => m.notes).find(x => !x.rest); return n ? { name: p.name, m: n.midi + E.INSTR[p.instrument].transpose + (i === song.partIndex ? (st.shift || 0) : 0) } : null; }).filter(Boolean);
     host.innerHTML = `<button data-chord="${triad.map(m => m + (st.shift || 0)).join(',')}"><b>主和弦</b><span>${E.keyLabel(song.fifths, song.minor).split('（')[0]}</span></button>` + firsts.map(x => `<button data-m="${x.m}"><b>${esc(x.name)}</b><span>起音 ${E.midiName(x.m)}</span></button>`).join('');
   }
-  else host.innerHTML = `<button data-m="69"><b>A</b><span class="num">${settings.A} Hz</span></button><button data-m="72"><b>C</b><span>Do</span></button><button data-m="79"><b>G</b><span>Sol</span></button><button data-m="84"><b>C</b><span>高音 Do</span></button>`;
+  else host.innerHTML = `<button data-m="69"><b>A</b><span class="num">${settings.A} 赫茲</span></button><button data-m="72"><b>C</b><span>Do</span></button><button data-m="79"><b>G</b><span>Sol</span></button><button data-m="84"><b>C</b><span>高音 Do</span></button>`;
   $$('#tStrings button').forEach(b => b.onclick = async () => {
     const ctx = await ac(); const out = ctx.createGain(); out.gain.value = settings.demoVol; out.connect(AU.master);
     if (b.dataset.chord) b.dataset.chord.split(',').forEach((m, i) => tone(ctx, out, +m, ctx.currentTime + 0.05 + i * 0.35, 3 - i * 0.35, 'piano', 0.4));
@@ -1531,7 +1531,7 @@ function tunerFrame(fr) {
   $('#tNeedle').setAttribute('stroke', col);
   $('#tNote').textContent = label; $('#tNote').style.color = col;
   const advice = TU.mode === 'violin' ? (c > 0 ? '太高，放鬆一點' : '太低，轉緊一點') : TU.mode === 'pipe' ? (c > 0 ? '唱高了，放鬆一點' : '唱低了，氣息撐住') : (c > 0 ? '偏高' : '偏低');
-  $('#tSub').textContent = `${f.toFixed(1)} Hz　${c > 0 ? '+' : ''}${c.toFixed(1)} cents　${Math.abs(c) <= 3 ? '準了' : advice}${sub ? '　' + sub : ''}`;
+  $('#tSub').textContent = `${f.toFixed(1)} 赫茲　${c > 0 ? '+' : ''}${c.toFixed(1)} 音分　${Math.abs(c) <= 3 ? '準了' : advice}${sub ? '　' + sub : ''}`;
   $$('#tStrings button').forEach(b => b.classList.toggle('on', +b.dataset.m === target));
   if (Math.abs(c) <= 3) {
     TU.okN = (TU.okTarget === target ? (TU.okN || 0) : 0) + 1; TU.okTarget = target;
@@ -1633,7 +1633,7 @@ function renderSettings() {
     const inp = (f, v) => v == null ? '<span class="muted">不判斷</span>' : `<input type="number" min="1" max="500" data-mode="${k}" data-f="${f}" value="${v}">`;
     return `<tr><td>${m.short}</td><td>${inp('pg', t.pg)}</td><td>${inp('py', t.py)}</td><td>${inp('rg', t.rg)}</td><td>${inp('ry', t.ry)}</td></tr>`;
   }).join('');
-  $('#tolTable').innerHTML = `<thead><tr><th>模式</th><th>音準綠<br>(cents)</th><th>音準黃<br>(cents)</th><th>起音綠<br>(毫秒)</th><th>起音黃<br>(毫秒)</th></tr></thead><tbody>${rows}</tbody>`;
+  $('#tolTable').innerHTML = `<thead><tr><th>模式</th><th>音準綠<br>(音分)</th><th>音準黃<br>(音分)</th><th>起音綠<br>(毫秒)</th><th>起音黃<br>(毫秒)</th></tr></thead><tbody>${rows}</tbody>`;
   $$('#tolTable input').forEach(i => i.onchange = () => {
     const v = Math.max(1, +i.value || 1); settings.tol[i.dataset.mode] = settings.tol[i.dataset.mode] || {};
     settings.tol[i.dataset.mode][i.dataset.f] = v; saveSettings(); toast('已更新標準');
@@ -2081,7 +2081,7 @@ function downloadReport() {
   const html = `<!doctype html><meta charset="utf-8"><title>練琴小幫手週報</title><style>body{font:15px/1.7 "Microsoft JhengHei",sans-serif;max-width:760px;margin:24px auto;padding:0 16px;color:#1c211f}h1{font-size:22px}table{border-collapse:collapse;width:100%}td,th{border-bottom:1px solid #ddd;padding:6px;text-align:left}small{color:#68716c}</style>
 <h1>練琴小幫手・一週練習報告</h1><p>${d.toLocaleDateString('zh-TW')} 產生（最近 7 天）。這份報告只記錄音準與節奏的檢查結果，給老師上課時參考。</p>
 <table><tr><th>曲子</th><th>次數</th><th>分鐘</th><th>分數（第一次→最近／最佳）</th><th>常錯小節</th><th>最近音準</th><th>最近節奏</th></tr>
-${rows.map(r => `<tr><td>${esc(r.name)}</td><td>${r.n}</td><td>${r.mins}</td><td>${r.first} → ${r.last}／${r.best}</td><td>${r.worst.join('、') || '—'}</td><td>${r.pitch == null ? '—' : '±' + r.pitch + ' cents'}</td><td>${r.rhythm == null ? '—' : '±' + r.rhythm + ' 毫秒'}</td></tr>`).join('') || '<tr><td colspan="7">這週還沒有練習紀錄</td></tr>'}</table>
+${rows.map(r => `<tr><td>${esc(r.name)}</td><td>${r.n}</td><td>${r.mins}</td><td>${r.first} → ${r.last}／${r.best}</td><td>${r.worst.join('、') || '—'}</td><td>${r.pitch == null ? '—' : '±' + r.pitch + ' 音分'}</td><td>${r.rhythm == null ? '—' : '±' + r.rhythm + ' 毫秒'}</td></tr>`).join('') || '<tr><td colspan="7">這週還沒有練習紀錄</td></tr>'}</table>
 <p>本週新過關的基本功：${passed} 項。星星總數：${settings.stars || 0}。</p><p><small>練琴小幫手　悠樂媽媽 製作・僅供個人與教學非商業使用</small></p>`;
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
   a.download = `練琴週報_${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}.html`;
